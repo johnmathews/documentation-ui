@@ -2,6 +2,7 @@
 	import { sendChat, type ChatMessage } from '$lib/api';
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
+	import { marked } from 'marked';
 
 	let {
 		docId = null,
@@ -100,11 +101,8 @@
 		confirmingClear = false;
 	}
 
-	function formatContent(content: string): string {
-		return content
-			.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-			.replace(/`(.*?)`/g, '<code>$1</code>')
-			.replace(/\n/g, '<br>');
+	function renderMarkdown(content: string): string {
+		return marked.parse(content, { async: false }) as string;
 	}
 </script>
 
@@ -185,9 +183,9 @@
 		{:else}
 			{#each messages as msg}
 				<div class="message" class:user={msg.role === 'user'} class:assistant={msg.role === 'assistant'}>
-					<div class="message-bubble">
+					<div class="message-bubble" class:markdown-content={msg.role === 'assistant'}>
 						{#if msg.role === 'assistant'}
-							{@html formatContent(msg.content)}
+							{@html renderMarkdown(msg.content)}
 						{:else}
 							{msg.content}
 						{/if}
@@ -372,12 +370,31 @@
 		border-bottom-left-radius: 2px;
 	}
 
-	.message-bubble :global(code) {
-		font-family: var(--font-mono);
+	/* Compact markdown overrides for chat bubbles */
+	.message-bubble :global(p:first-child) { margin-top: 0; }
+	.message-bubble :global(p:last-child) { margin-bottom: 0; }
+	.message-bubble :global(p) { margin: 0.4rem 0; }
+	.message-bubble :global(h1),
+	.message-bubble :global(h2),
+	.message-bubble :global(h3) {
+		font-size: 0.95rem;
+		margin: 0.6rem 0 0.3rem;
+	}
+	.message-bubble :global(ul),
+	.message-bubble :global(ol) {
+		margin: 0.3rem 0;
+		padding-left: 1.2rem;
+	}
+	.message-bubble :global(li) { margin: 0.15rem 0; }
+	.message-bubble :global(pre) {
+		margin: 0.4rem 0;
+		padding: 0.5rem 0.7rem;
 		font-size: 0.8em;
-		background: rgba(0, 0, 0, 0.2);
-		padding: 0.1em 0.3em;
-		border-radius: 3px;
+		overflow-x: auto;
+	}
+	.message-bubble :global(blockquote) {
+		margin: 0.4rem 0;
+		padding-left: 0.75rem;
 	}
 
 	.typing {
