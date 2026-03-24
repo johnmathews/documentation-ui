@@ -44,6 +44,24 @@
 		expandedCategories[key] = !expandedCategories[key];
 	}
 
+	function expandAll() {
+		for (const s of tree) {
+			expandedSources[s.source] = true;
+			expandedCategories[`${s.source}:docs`] = true;
+			expandedCategories[`${s.source}:journal`] = true;
+		}
+	}
+
+	function collapseAll() {
+		for (const s of tree) {
+			expandedSources[s.source] = false;
+			expandedCategories[`${s.source}:docs`] = false;
+			expandedCategories[`${s.source}:journal`] = false;
+		}
+	}
+
+	let allExpanded = $derived(tree.length > 0 && tree.every(s => expandedSources[s.source]));
+
 	function handleSearch() {
 		clearTimeout(searchTimeout);
 		if (!searchQuery.trim()) {
@@ -111,6 +129,38 @@
 	{:else if error}
 		<div class="error-msg">{error}</div>
 	{:else}
+		<div class="tree-actions">
+			<a href="/journal" class="journal-link" onclick={onNavigate}>
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+					<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+					<line x1="16" y1="2" x2="16" y2="6" />
+					<line x1="8" y1="2" x2="8" y2="6" />
+					<line x1="3" y1="10" x2="21" y2="10" />
+				</svg>
+				All Journal Entries
+			</a>
+			<div class="expand-collapse">
+				{#if allExpanded}
+					<button class="tree-action-btn" onclick={collapseAll} title="Collapse all">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polyline points="4 14 10 14 10 20" />
+							<polyline points="20 10 14 10 14 4" />
+							<line x1="14" y1="10" x2="21" y2="3" />
+							<line x1="3" y1="21" x2="10" y2="14" />
+						</svg>
+					</button>
+				{:else}
+					<button class="tree-action-btn" onclick={expandAll} title="Expand all">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polyline points="15 3 21 3 21 9" />
+							<polyline points="9 21 3 21 3 15" />
+							<line x1="21" y1="3" x2="14" y2="10" />
+							<line x1="3" y1="21" x2="10" y2="14" />
+						</svg>
+					</button>
+				{/if}
+			</div>
+		</div>
 		<nav class="tree">
 			{#each tree as source}
 				<div class="tree-source">
@@ -223,6 +273,52 @@
 
 	.search-box input::placeholder {
 		color: var(--text-dim);
+	}
+
+	.tree-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.journal-link {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--text-muted);
+		font-size: 0.8rem;
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+
+	.journal-link:hover {
+		color: var(--accent);
+	}
+
+	.expand-collapse {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.tree-action-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.3rem;
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.tree-action-btn:hover {
+		background: var(--bg-hover);
+		color: var(--text);
+		border-color: var(--text-dim);
 	}
 
 	.loading-msg, .error-msg {
