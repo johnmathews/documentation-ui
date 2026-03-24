@@ -145,7 +145,7 @@ describe('fetchTree', () => {
 	});
 
 	it('calls /api/tree and returns parsed JSON', async () => {
-		const mockData = [{ source: 'test', docs: [], journal: [] }];
+		const mockData = [{ source: 'test', root_docs: [], docs: [], journal: [] }];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({

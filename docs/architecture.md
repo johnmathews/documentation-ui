@@ -11,7 +11,7 @@ interface powered by Claude that has full context of the documentation.
 ### Frontend (SvelteKit)
 
 - **Layout**: Three-panel layout with sidebar, content area, and collapsible chat panel
-- **Sidebar**: Tree navigation organized by Source > Category (docs/journal) > Document, with expand/collapse all controls and a link to the journal timeline
+- **Sidebar**: Tree navigation organized by Source > Category (root\_docs/docs/journal) > Document, with expand/collapse controls inside the tree section and a link to the journal timeline. Each source has a deterministic color tag for visual distinction. Root-level documents (e.g. README.md) appear directly under each source, before subcategories.
 - **Document Viewer**: Renders markdown documents with metadata headers
 - **Chat Panel**: Real-time chat with Claude, aware of the currently viewed page
 - **Search**: Debounced search across all documentation via the sidebar

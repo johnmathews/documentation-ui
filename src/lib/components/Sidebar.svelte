@@ -16,6 +16,26 @@
 	let searching = $state(false);
 	let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
+	// Deterministic color palette for source tags — subtle, muted tones
+	const SOURCE_COLORS = [
+		{ bg: 'rgba(96, 165, 250, 0.15)', text: 'rgb(96, 165, 250)' },   // blue
+		{ bg: 'rgba(52, 211, 153, 0.15)', text: 'rgb(52, 211, 153)' },   // emerald
+		{ bg: 'rgba(251, 146, 60, 0.15)', text: 'rgb(251, 146, 60)' },   // orange
+		{ bg: 'rgba(167, 139, 250, 0.15)', text: 'rgb(167, 139, 250)' }, // violet
+		{ bg: 'rgba(248, 113, 113, 0.15)', text: 'rgb(248, 113, 113)' }, // red
+		{ bg: 'rgba(45, 212, 191, 0.15)', text: 'rgb(45, 212, 191)' },   // teal
+		{ bg: 'rgba(250, 204, 21, 0.15)', text: 'rgb(202, 175, 41)' },   // yellow
+		{ bg: 'rgba(244, 114, 182, 0.15)', text: 'rgb(244, 114, 182)' }, // pink
+	];
+
+	function sourceColor(name: string): { bg: string; text: string } {
+		let hash = 0;
+		for (let i = 0; i < name.length; i++) {
+			hash = name.charCodeAt(i) + ((hash << 5) - hash);
+		}
+		return SOURCE_COLORS[Math.abs(hash) % SOURCE_COLORS.length];
+	}
+
 	$effect(() => {
 		loadTree();
 	});
@@ -91,6 +111,10 @@
 	function displayTitle(doc: { title: string | null; file_path: string }): string {
 		return doc.title || doc.file_path.split('/').pop() || doc.file_path;
 	}
+
+	function totalDocs(source: TreeSource): number {
+		return source.root_docs.length + source.docs.length + source.journal.length;
+	}
 </script>
 
 <div class="sidebar-inner">
@@ -118,7 +142,10 @@
 						onclick={onNavigate}
 					>
 						<span class="item-title">{displayTitle(result)}</span>
-						<span class="item-source">{result.source}</span>
+						<span
+							class="source-tag"
+							style="background: {sourceColor(result.source).bg}; color: {sourceColor(result.source).text}"
+						>{result.source}</span>
 						<span class="item-snippet">{result.snippet}</span>
 					</a>
 				{/each}
@@ -139,40 +166,65 @@
 				</svg>
 				All Journal Entries
 			</a>
-			<div class="expand-collapse">
-				{#if allExpanded}
-					<button class="tree-action-btn" onclick={collapseAll} title="Collapse all">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<polyline points="4 14 10 14 10 20" />
-							<polyline points="20 10 14 10 14 4" />
-							<line x1="14" y1="10" x2="21" y2="3" />
-							<line x1="3" y1="21" x2="10" y2="14" />
-						</svg>
-					</button>
-				{:else}
-					<button class="tree-action-btn" onclick={expandAll} title="Expand all">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<polyline points="15 3 21 3 21 9" />
-							<polyline points="9 21 3 21 3 15" />
-							<line x1="21" y1="3" x2="14" y2="10" />
-							<line x1="3" y1="21" x2="10" y2="14" />
-						</svg>
-					</button>
-				{/if}
-			</div>
 		</div>
 		<nav class="tree">
+			<div class="tree-header">
+				<span class="tree-header-label">Documents</span>
+				<div class="expand-collapse">
+					{#if allExpanded}
+						<button class="tree-action-btn" onclick={collapseAll} title="Collapse all">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="4 14 10 14 10 20" />
+								<polyline points="20 10 14 10 14 4" />
+								<line x1="14" y1="10" x2="21" y2="3" />
+								<line x1="3" y1="21" x2="10" y2="14" />
+							</svg>
+						</button>
+					{:else}
+						<button class="tree-action-btn" onclick={expandAll} title="Expand all">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="15 3 21 3 21 9" />
+								<polyline points="9 21 3 21 3 15" />
+								<line x1="21" y1="3" x2="14" y2="10" />
+								<line x1="3" y1="21" x2="10" y2="14" />
+							</svg>
+						</button>
+					{/if}
+				</div>
+			</div>
 			{#each tree as source}
 				<div class="tree-source">
 					<button class="tree-toggle" onclick={() => toggleSource(source.source)}>
 						<svg class="chevron" class:expanded={expandedSources[source.source]} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 							<polyline points="9 18 15 12 9 6" />
 						</svg>
-						<span class="source-name">{source.source}</span>
-						<span class="count">{source.docs.length + source.journal.length}</span>
+						<span
+							class="source-tag"
+							style="background: {sourceColor(source.source).bg}; color: {sourceColor(source.source).text}"
+						>{source.source}</span>
+						<span class="count">{totalDocs(source)}</span>
 					</button>
 
 					{#if expandedSources[source.source]}
+						{#if source.root_docs.length > 0}
+							<div class="tree-items root-docs">
+								{#each source.root_docs as doc}
+									<a
+										href={docUrl(doc.doc_id)}
+										class="tree-item"
+										class:active={isActive(doc.doc_id)}
+										onclick={onNavigate}
+									>
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+											<polyline points="14 2 14 8 20 8" />
+										</svg>
+										<span class="item-title">{displayTitle(doc)}</span>
+									</a>
+								{/each}
+							</div>
+						{/if}
+
 						{#if source.docs.length > 0}
 							<div class="tree-category">
 								<button class="tree-toggle category-toggle" onclick={() => toggleCategory(`${source.source}:docs`)}>
@@ -297,6 +349,21 @@
 		color: var(--accent);
 	}
 
+	.tree-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.4rem 0.75rem;
+	}
+
+	.tree-header-label {
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-dim);
+	}
+
 	.expand-collapse {
 		display: flex;
 		gap: 0.25rem;
@@ -335,7 +402,7 @@
 	.tree {
 		flex: 1;
 		overflow-y: auto;
-		padding: 0.5rem 0;
+		padding: 0.25rem 0 0.5rem;
 	}
 
 	.tree-source {
@@ -381,11 +448,14 @@
 		transform: rotate(90deg);
 	}
 
-	.source-name {
-		flex: 1;
+	.source-tag {
+		font-size: 0.72rem;
+		font-weight: 600;
+		padding: 0.1rem 0.45rem;
+		border-radius: 4px;
+		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.count {
@@ -399,6 +469,10 @@
 
 	.tree-items {
 		padding: 0.15rem 0;
+	}
+
+	.root-docs {
+		padding-left: 0;
 	}
 
 	.tree-item {
@@ -435,11 +509,6 @@
 		align-items: flex-start;
 		gap: 0.2rem;
 		padding-left: 1rem;
-	}
-
-	.item-source {
-		font-size: 0.7rem;
-		color: var(--text-dim);
 	}
 
 	.item-snippet {

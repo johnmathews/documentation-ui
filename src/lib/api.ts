@@ -3,6 +3,7 @@
 
 export interface TreeSource {
 	source: string;
+	root_docs: TreeDocument[];
 	docs: TreeDocument[];
 	journal: TreeDocument[];
 }
