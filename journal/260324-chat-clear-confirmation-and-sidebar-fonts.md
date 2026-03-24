@@ -21,6 +21,21 @@ The initial `$effect` used `if (messages)` to trigger saves, which only tracks t
 not mutations via `.push()`. Changed to `void messages.length` which reads the reactive proxy's
 length property, correctly triggering the effect on push/splice operations.
 
+### SSR fix
+
+`localStorage` calls at component init time crashed server-side rendering (SvelteKit runs
+components on the server). Fixed by importing `browser` from `$app/environment` and gating
+all localStorage access inside `$effect` blocks that early-return when `!browser`. State
+initializes with empty defaults for the server pass.
+
+A hydration guard (`hydrated` flag) prevents the save effect from overwriting stored data
+with `[]` before the load effect runs on mount.
+
+### Restore button discoverability
+
+Added a prominent "Restore previous chat" button in the empty state area (center of the chat
+panel) in addition to the small icon in the header, making it much easier to find.
+
 ## Sidebar Font Size
 
 Increased font sizes across the sidebar for better readability:

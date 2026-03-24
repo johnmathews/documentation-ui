@@ -22,6 +22,7 @@
 	let messagesEl: HTMLDivElement | undefined = $state();
 	let confirmingClear = $state(false);
 	let hasPrevious = $state(false);
+	let hydrated = false;
 
 	// Load from localStorage on mount (browser only)
 	$effect(() => {
@@ -31,12 +32,14 @@
 			if (stored) messages = JSON.parse(stored);
 		} catch { /* ignore */ }
 		hasPrevious = !!localStorage.getItem(PREV_STORAGE_KEY);
+		hydrated = true;
 	});
 
 	// Persist messages to localStorage on change (browser only)
 	$effect(() => {
 		if (!browser) return;
 		void messages.length;
+		if (!hydrated) return;
 		try {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
 		} catch { /* quota exceeded — ignore */ }
