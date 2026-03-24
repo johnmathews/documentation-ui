@@ -1,6 +1,7 @@
 :root {
 	--sidebar-width: 280px;
 	--chat-width: 360px;
+	--chat-width-expanded: 50vw;
 	--bg: #0f1117;
 	--bg-surface: #1a1d27;
 	--bg-hover: #242836;
@@ -17,6 +18,21 @@
 	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 	--radius: 6px;
 	--radius-lg: 10px;
+}
+
+[data-theme="light"] {
+	--bg: #f8f9fb;
+	--bg-surface: #ffffff;
+	--bg-hover: #f0f1f4;
+	--bg-active: #e4e6eb;
+	--border: #d4d7e0;
+	--text: #1a1d27;
+	--text-muted: #5a5f72;
+	--text-dim: #8b90a0;
+	--accent: #4a6cf7;
+	--accent-hover: #3b5ce5;
+	--accent-dim: rgba(74, 108, 247, 0.08);
+	--success: #22c55e;
 }
 
 * {

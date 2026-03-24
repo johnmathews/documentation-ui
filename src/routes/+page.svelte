@@ -51,7 +51,7 @@
 		<div class="sources-grid">
 			{#each tree as source}
 				<div class="source-card">
-					<h2>{source.source}</h2>
+					<h2><a href="/source/{encodeURIComponent(source.source)}">{source.source}</a></h2>
 					<div class="stats">
 						<span>{source.docs.length} docs</span>
 						<span>{source.journal.length} journal entries</span>
@@ -59,7 +59,7 @@
 
 					{#if source.docs.length > 0}
 						<div class="doc-section">
-							<h3>Documentation</h3>
+							<h3><a href="/source/{encodeURIComponent(source.source)}/docs">Documentation</a></h3>
 							<ul>
 								{#each source.docs.slice(0, 5) as doc}
 									<li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
@@ -73,7 +73,7 @@
 
 					{#if source.journal.length > 0}
 						<div class="doc-section">
-							<h3>Recent Journal Entries</h3>
+							<h3><a href="/source/{encodeURIComponent(source.source)}/journal">Recent Journal Entries</a></h3>
 							<ul>
 								{#each source.journal.slice(0, 3) as doc}
 									<li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
@@ -134,6 +134,14 @@
 		font-size: 1.2rem;
 		font-weight: 600;
 		margin-bottom: 0.5rem;
+	}
+
+	.source-card h2 a {
+		color: var(--text);
+	}
+
+	.source-card h2 a:hover {
+		color: var(--accent);
 	}
 
 	.stats {

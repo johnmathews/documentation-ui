@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { fetchDocument, type FullDocument } from '$lib/api';
 	import { currentDocId } from '$lib/stores.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { marked } from 'marked';
 
 	let doc: FullDocument | null = $state(null);
@@ -71,9 +72,14 @@
 	</div>
 {:else if doc}
 	<article class="document">
+		<Breadcrumbs
+			source={doc.source}
+			category={doc.file_path.includes('journal/') ? 'journal' : 'docs'}
+			title={doc.title || doc.file_path.split('/').pop() || doc.file_path}
+		/>
 		<header class="doc-header">
 			<div class="doc-meta">
-				<span class="source-badge">{doc.source}</span>
+				<a href="/source/{encodeURIComponent(doc.source)}" class="source-badge">{doc.source}</a>
 				<span class="file-path">{doc.file_path}</span>
 			</div>
 			{#if doc.title}

@@ -2,7 +2,15 @@
 	import { sendChat, type ChatMessage } from '$lib/api';
 	import { tick } from 'svelte';
 
-	let { docId = null }: { docId: string | null } = $props();
+	let {
+		docId = null,
+		expanded = false,
+		onToggleExpand = () => {}
+	}: {
+		docId: string | null;
+		expanded?: boolean;
+		onToggleExpand?: () => void;
+	} = $props();
 
 	let messages: ChatMessage[] = $state([]);
 	let input = $state('');
@@ -62,17 +70,30 @@
 					<line x1="12" y1="16" x2="12" y2="12" />
 					<line x1="12" y1="8" x2="12.01" y2="8" />
 				</svg>
-				Page context active
+				Page context
 			</span>
 		{/if}
-		{#if messages.length > 0}
-			<button class="clear-btn" onclick={clearChat} title="Clear chat">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<polyline points="3 6 5 6 21 6" />
-					<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-				</svg>
+		<div class="header-actions">
+			{#if messages.length > 0}
+				<button class="header-btn" onclick={clearChat} title="Clear chat">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="3 6 5 6 21 6" />
+						<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+					</svg>
+				</button>
+			{/if}
+			<button class="header-btn" onclick={onToggleExpand} title={expanded ? 'Collapse' : 'Expand'}>
+				{#if expanded}
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="4 14 10 14 10 20" /><polyline points="20 10 14 10 14 4" /><line x1="14" y1="10" x2="21" y2="3" /><line x1="3" y1="21" x2="10" y2="14" />
+					</svg>
+				{:else}
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" /><line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
+					</svg>
+				{/if}
 			</button>
-		{/if}
+		</div>
 	</div>
 
 	<div class="messages" bind:this={messagesEl}>
@@ -158,8 +179,13 @@
 		flex-shrink: 0;
 	}
 
-	.clear-btn {
+	.header-actions {
 		margin-left: auto;
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.header-btn {
 		padding: 0.3rem;
 		background: none;
 		border: none;
@@ -167,7 +193,7 @@
 		border-radius: var(--radius);
 	}
 
-	.clear-btn:hover {
+	.header-btn:hover {
 		background: var(--bg-hover);
 		color: var(--text);
 	}
@@ -214,8 +240,8 @@
 		max-width: 85%;
 		padding: 0.6rem 0.85rem;
 		border-radius: var(--radius-lg);
-		font-size: 0.85rem;
-		line-height: 1.5;
+		font-size: 0.9rem;
+		line-height: 1.55;
 		word-break: break-word;
 	}
 
