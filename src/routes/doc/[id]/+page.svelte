@@ -1,0 +1,185 @@
+<script lang="ts">
+	import { page } from '$app/state';
+	import { fetchDocument, type FullDocument } from '$lib/api';
+	import { currentDocId } from '$lib/stores.svelte';
+	import { marked } from 'marked';
+
+	let doc: FullDocument | null = $state(null);
+	let loading = $state(true);
+	let error = $state('');
+
+	let currentId = $derived(decodeURIComponent(page.params.id));
+
+	$effect(() => {
+		const id = currentId;
+		currentDocId.value = id;
+		loadDocument(id);
+
+		return () => {
+			// Clean up when leaving
+			if (currentDocId.value === id) {
+				currentDocId.value = null;
+			}
+		};
+	});
+
+	async function loadDocument(docId: string) {
+		loading = true;
+		error = '';
+		doc = null;
+
+		try {
+			doc = await fetchDocument(docId);
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Failed to load document';
+		} finally {
+			loading = false;
+		}
+	}
+
+	function renderMarkdown(content: string): string {
+		return marked.parse(content, { async: false }) as string;
+	}
+
+	function formatDate(dateStr: string | null): string {
+		if (!dateStr) return '';
+		try {
+			return new Date(dateStr).toLocaleDateString('en-GB', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+		} catch {
+			return dateStr;
+		}
+	}
+</script>
+
+<svelte:head>
+	<title>{doc?.title || 'Document'} - Documentation</title>
+</svelte:head>
+
+{#if loading}
+	<div class="status-page">
+		<div class="spinner"></div>
+		<p>Loading document...</p>
+	</div>
+{:else if error}
+	<div class="status-page">
+		<p class="error">{error}</p>
+		<a href="/">Back to home</a>
+	</div>
+{:else if doc}
+	<article class="document">
+		<header class="doc-header">
+			<div class="doc-meta">
+				<span class="source-badge">{doc.source}</span>
+				<span class="file-path">{doc.file_path}</span>
+			</div>
+			{#if doc.title}
+				<h1>{doc.title}</h1>
+			{/if}
+			<div class="doc-dates">
+				{#if doc.created_at}
+					<span>Created: {formatDate(doc.created_at)}</span>
+				{/if}
+				{#if doc.modified_at}
+					<span>Modified: {formatDate(doc.modified_at)}</span>
+				{/if}
+			</div>
+		</header>
+
+		{#if doc.content}
+			<div class="markdown-content">
+				{@html renderMarkdown(doc.content)}
+			</div>
+		{:else}
+			<p class="no-content">This document has no content.</p>
+		{/if}
+	</article>
+{/if}
+
+<style>
+	.status-page {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		padding: 4rem;
+		color: var(--text-muted);
+	}
+
+	.error {
+		color: #f87171;
+	}
+
+	.spinner {
+		width: 24px;
+		height: 24px;
+		border: 2px solid var(--border);
+		border-top-color: var(--accent);
+		border-radius: 50%;
+		animation: spin 0.6s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.document {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.doc-header {
+		margin-bottom: 2rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.doc-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.source-badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--accent);
+		background: var(--accent-dim);
+		padding: 0.15rem 0.5rem;
+		border-radius: 4px;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.file-path {
+		font-size: 0.8rem;
+		color: var(--text-dim);
+		font-family: var(--font-mono);
+	}
+
+	.doc-header h1 {
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1.3;
+		color: var(--text);
+		margin: 0;
+	}
+
+	.doc-dates {
+		display: flex;
+		gap: 1.5rem;
+		margin-top: 0.75rem;
+		font-size: 0.8rem;
+		color: var(--text-dim);
+	}
+
+	.no-content {
+		color: var(--text-muted);
+		font-style: italic;
+	}
+</style>

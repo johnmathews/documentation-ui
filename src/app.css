@@ -1,0 +1,171 @@
+:root {
+	--sidebar-width: 280px;
+	--chat-width: 360px;
+	--bg: #0f1117;
+	--bg-surface: #1a1d27;
+	--bg-hover: #242836;
+	--bg-active: #2d3245;
+	--border: #2d3245;
+	--text: #e1e4ed;
+	--text-muted: #8b90a0;
+	--text-dim: #6b7084;
+	--accent: #6c8cff;
+	--accent-hover: #8aa4ff;
+	--accent-dim: rgba(108, 140, 255, 0.1);
+	--success: #4ade80;
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+	--radius: 6px;
+	--radius-lg: 10px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+	font-family: var(--font-sans);
+	background: var(--bg);
+	color: var(--text);
+	font-size: 14px;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--accent-hover);
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--text-dim);
+}
+
+/* Markdown content styles */
+.markdown-content {
+	max-width: 800px;
+	line-height: 1.7;
+}
+
+.markdown-content h1 {
+	font-size: 1.8rem;
+	font-weight: 700;
+	margin: 2rem 0 1rem;
+	color: var(--text);
+}
+
+.markdown-content h2 {
+	font-size: 1.4rem;
+	font-weight: 600;
+	margin: 1.8rem 0 0.8rem;
+	color: var(--text);
+	padding-bottom: 0.3rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.markdown-content h3 {
+	font-size: 1.15rem;
+	font-weight: 600;
+	margin: 1.4rem 0 0.6rem;
+	color: var(--text);
+}
+
+.markdown-content p {
+	margin: 0.6rem 0;
+}
+
+.markdown-content ul, .markdown-content ol {
+	padding-left: 1.5rem;
+	margin: 0.6rem 0;
+}
+
+.markdown-content li {
+	margin: 0.3rem 0;
+}
+
+.markdown-content code {
+	font-family: var(--font-mono);
+	font-size: 0.85em;
+	background: var(--bg);
+	padding: 0.15em 0.4em;
+	border-radius: 3px;
+	border: 1px solid var(--border);
+}
+
+.markdown-content pre {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: 1rem;
+	overflow-x: auto;
+	margin: 1rem 0;
+}
+
+.markdown-content pre code {
+	background: none;
+	border: none;
+	padding: 0;
+	font-size: 0.85em;
+}
+
+.markdown-content blockquote {
+	border-left: 3px solid var(--accent);
+	padding-left: 1rem;
+	margin: 1rem 0;
+	color: var(--text-muted);
+}
+
+.markdown-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1rem 0;
+}
+
+.markdown-content th, .markdown-content td {
+	border: 1px solid var(--border);
+	padding: 0.5rem 0.75rem;
+	text-align: left;
+}
+
+.markdown-content th {
+	background: var(--bg);
+	font-weight: 600;
+}
+
+.markdown-content img {
+	max-width: 100%;
+	border-radius: var(--radius);
+}
+
+.markdown-content hr {
+	border: none;
+	border-top: 1px solid var(--border);
+	margin: 1.5rem 0;
+}
