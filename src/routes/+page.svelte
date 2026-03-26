@@ -112,19 +112,20 @@
 
 <style>
  .home {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
  }
 
  h1 {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
  }
 
  .subtitle {
   color: var(--text-muted);
   margin-bottom: 2rem;
+  font-size: 1.5rem;
  }
 
  .loading,

@@ -39,9 +39,9 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
  }
 
  .breadcrumbs a {

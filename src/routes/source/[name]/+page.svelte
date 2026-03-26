@@ -143,15 +143,18 @@
  .subtitle {
   color: var(--text-muted);
   margin-bottom: 2rem;
+  font-size: 1.5rem;
  }
  section {
   margin-bottom: 2rem;
  }
  h2 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
-  padding-bottom: 0.4rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
  }
  h2 a {
@@ -189,7 +192,7 @@
    font-size: 1.5rem;
   }
   .subtitle {
-   font-size: 5rem;
+   font-size: 1rem;
   }
   .doc-list li {
    flex-direction: column;

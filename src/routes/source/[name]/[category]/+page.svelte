@@ -89,13 +89,13 @@
 	.status { padding: 4rem; text-align: center; color: var(--text-muted); }
 	.error { color: #f87171; }
 	h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
-	.subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+	.subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.5rem; }
 	.empty { color: var(--text-dim); font-style: italic; }
 	.doc-list { list-style: none; }
 	.doc-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
-	.doc-list a { color: var(--text); font-size: 0.95rem; }
+	.doc-list a { color: var(--text); font-size: 1.25rem; }
 	.doc-list a:hover { color: var(--accent); }
-	.date { font-size: 0.8rem; color: var(--text-dim); flex-shrink: 0; margin-left: 1rem; }
+	.date { font-size: 1rem; color: var(--text-dim); flex-shrink: 0; margin-left: 1rem; }
 
 	@media (max-width: 600px) {
 		h1 { font-size: 1.5rem; }
