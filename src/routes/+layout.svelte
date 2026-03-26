@@ -211,6 +211,7 @@
 		overflow-x: hidden;
 		display: flex;
 		flex-direction: column;
+		padding-bottom: env(safe-area-inset-bottom, 0);
 	}
 
 	.sidebar:not(.open) {
@@ -221,6 +222,7 @@
 		flex: 1;
 		overflow-y: auto;
 		padding: 2rem;
+		padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
 		min-width: 0;
 	}
 
@@ -302,7 +304,7 @@
 		.chat-panel {
 			width: 100%;
 		}
-		.content { padding: 1rem; }
+		.content { padding: 1rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0)); }
 		.btn-label { display: none; }
 		.icon-btn {
 			min-height: 44px;
@@ -314,6 +316,17 @@
 			min-height: 44px;
 			display: inline-flex;
 			align-items: center;
+		}
+	}
+
+	/* Landscape phones: short viewport means sidebar/chat should be full-screen modals */
+	@media (max-height: 500px) and (max-width: 1024px) {
+		.sidebar {
+			width: 100%;
+			max-width: none;
+		}
+		.chat-panel {
+			width: 100%;
 		}
 	}
 </style>

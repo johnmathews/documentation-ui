@@ -479,7 +479,7 @@
 		}
 		.chat-input input {
 			min-height: 44px;
-			font-size: 1rem;
+			font-size: 16px; /* Explicit 16px prevents iOS Safari auto-zoom on focus */
 		}
 		.restore-hint {
 			min-height: 44px;

@@ -12,7 +12,7 @@ interface powered by Claude that has full context of the documentation.
 
 - **Layout**: Three-panel layout with sidebar, content area, and collapsible chat panel
 - **Sidebar**: Tree navigation organized by Source > Category (root\_docs/docs/journal/engineering\_team) > Document, with expand/collapse controls inside the tree section and a link to the journal timeline. Each source has a deterministic color tag for visual distinction. Root-level documents (e.g. README.md) appear directly under each source, before subcategories.
-- **Mobile Responsiveness**: Drawer-style sidebar (85% width with backdrop/scrim), swipe gestures (edge-swipe to open/close panels), 44px minimum touch targets, safe-area-inset handling for notched devices, dynamic viewport height (`100dvh`), and responsive typography.
+- **Mobile Responsiveness**: Full-screen modal sidebar and chat panels on mobile (100% width in both portrait and landscape), swipe gestures (edge-swipe to open/close panels), 44px minimum touch targets, safe-area-inset handling for notched devices (top bar, content, sidebar, and chat input all respect `env(safe-area-inset-*)`), dynamic viewport height (`100dvh`), explicit 16px font size on mobile inputs to prevent iOS Safari auto-zoom, responsive typography, and a landscape-phone breakpoint (`max-height: 500px`) ensuring panels remain full-screen modals on rotated phones.
 - **Document Viewer**: Renders markdown documents with metadata headers
 - **Chat Panel**: Real-time chat with Claude, aware of the currently viewed page
 - **Search**: Debounced search across all documentation via the sidebar
