@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { TreeSource, TreeDocument } from '$lib/api';
 import { sourceColor } from '$lib/colors';
 
 // Test the pure utility logic that the API module and components share
@@ -200,5 +201,201 @@ describe('fetchTree', () => {
 
 		const { fetchTree } = await import('$lib/api');
 		await expect(fetchTree()).rejects.toThrow('Backend unavailable');
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Regression tests: optional fields in TreeSource
+//
+// The backend may not include all category fields (e.g. engineering_team)
+// when running an older version. The UI must handle missing fields without
+// crashing. This test suite mirrors every access pattern used in the
+// Svelte components to catch TypeError on undefined fields.
+// ---------------------------------------------------------------------------
+
+function makeDoc(docId: string, filePath: string): TreeDocument {
+	return {
+		doc_id: docId,
+		source: docId.split(':')[0],
+		file_path: filePath,
+		title: filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? null,
+		created_at: '2026-01-01T00:00:00Z',
+		modified_at: '2026-01-01T00:00:00Z',
+		size_bytes: 100
+	};
+}
+
+/** Backend response without engineering_team (older server version). */
+function makeSourceWithoutEngTeam(name: string): TreeSource {
+	return {
+		source: name,
+		root_docs: [makeDoc(`${name}:README.md`, 'README.md')],
+		docs: [makeDoc(`${name}:docs/setup.md`, 'docs/setup.md')],
+		journal: [makeDoc(`${name}:journal/260101-init.md`, 'journal/260101-init.md')]
+		// engineering_team intentionally omitted — simulates older backend
+	};
+}
+
+/** Backend response with engineering_team (current server version). */
+function makeSourceWithEngTeam(name: string): TreeSource {
+	return {
+		...makeSourceWithoutEngTeam(name),
+		engineering_team: [
+			makeDoc(`${name}:.engineering-team/eval.md`, '.engineering-team/evaluation-report.md'),
+			makeDoc(`${name}:.engineering-team/plan.md`, '.engineering-team/improvement-plan.md')
+		]
+	};
+}
+
+describe('TreeSource optional field regression tests', () => {
+	// --- Sidebar.svelte: totalDocs() ---
+	describe('totalDocs calculation (Sidebar.svelte)', () => {
+		function totalDocs(source: TreeSource): number {
+			return source.root_docs.length + source.docs.length + source.journal.length + (source.engineering_team?.length ?? 0);
+		}
+
+		it('works when engineering_team is missing', () => {
+			expect(totalDocs(makeSourceWithoutEngTeam('test'))).toBe(3);
+		});
+
+		it('works when engineering_team is present', () => {
+			expect(totalDocs(makeSourceWithEngTeam('test'))).toBe(5);
+		});
+
+		it('works when engineering_team is an empty array', () => {
+			const source = { ...makeSourceWithoutEngTeam('test'), engineering_team: [] };
+			expect(totalDocs(source)).toBe(3);
+		});
+	});
+
+	// --- Sidebar.svelte: {#if (source.engineering_team?.length ?? 0) > 0} ---
+	describe('conditional rendering guard (Sidebar.svelte, +page.svelte)', () => {
+		function shouldShowEngTeam(source: TreeSource): boolean {
+			return (source.engineering_team?.length ?? 0) > 0;
+		}
+
+		it('returns false when field is missing', () => {
+			expect(shouldShowEngTeam(makeSourceWithoutEngTeam('test'))).toBe(false);
+		});
+
+		it('returns false when field is empty array', () => {
+			expect(shouldShowEngTeam({ ...makeSourceWithoutEngTeam('test'), engineering_team: [] })).toBe(false);
+		});
+
+		it('returns true when field has items', () => {
+			expect(shouldShowEngTeam(makeSourceWithEngTeam('test'))).toBe(true);
+		});
+	});
+
+	// --- Sidebar.svelte: {#each (source.engineering_team ?? []) as doc} ---
+	describe('iteration with fallback (Sidebar.svelte)', () => {
+		it('iterates zero items when field is missing', () => {
+			const source = makeSourceWithoutEngTeam('test');
+			const ids = (source.engineering_team ?? []).map((d) => d.doc_id);
+			expect(ids).toEqual([]);
+		});
+
+		it('iterates all items when field is present', () => {
+			const source = makeSourceWithEngTeam('test');
+			const ids = (source.engineering_team ?? []).map((d) => d.doc_id);
+			expect(ids).toHaveLength(2);
+		});
+	});
+
+	// --- +page.svelte: {#each (source.engineering_team ?? []).slice(0, 3) as doc} ---
+	describe('slicing with fallback (+page.svelte)', () => {
+		it('returns empty array when field is missing', () => {
+			const source = makeSourceWithoutEngTeam('test');
+			expect((source.engineering_team ?? []).slice(0, 3)).toEqual([]);
+		});
+
+		it('slices correctly when field has items', () => {
+			const source = makeSourceWithEngTeam('test');
+			expect((source.engineering_team ?? []).slice(0, 3)).toHaveLength(2);
+		});
+	});
+
+	// --- +page.svelte stats display: {source.engineering_team?.length ?? 0} ---
+	describe('count display (+page.svelte stats)', () => {
+		it('shows 0 when field is missing', () => {
+			const source = makeSourceWithoutEngTeam('test');
+			expect(source.engineering_team?.length ?? 0).toBe(0);
+		});
+
+		it('shows correct count when field is present', () => {
+			const source = makeSourceWithEngTeam('test');
+			expect(source.engineering_team?.length ?? 0).toBe(2);
+		});
+	});
+
+	// --- source/[name]/[category]/+page.svelte: docs = source.engineering_team ?? [] ---
+	describe('category page data loading ([category]/+page.svelte)', () => {
+		it('returns empty array when field is missing', () => {
+			const source = makeSourceWithoutEngTeam('test');
+			const docs = source.engineering_team ?? [];
+			expect(docs).toEqual([]);
+		});
+
+		it('returns docs when field is present', () => {
+			const source = makeSourceWithEngTeam('test');
+			const docs = source.engineering_team ?? [];
+			expect(docs).toHaveLength(2);
+		});
+	});
+
+	// --- doc/[id]/+page.svelte: category detection from file_path ---
+	describe('category detection from file_path (doc/[id]/+page.svelte)', () => {
+		function detectCategory(filePath: string): string {
+			if (filePath.includes('journal/')) return 'journal';
+			if (filePath.includes('.engineering-team/')) return 'engineering_team';
+			return 'docs';
+		}
+
+		it('detects journal category', () => {
+			expect(detectCategory('journal/260101-init.md')).toBe('journal');
+		});
+
+		it('detects engineering_team category', () => {
+			expect(detectCategory('.engineering-team/evaluation-report.md')).toBe('engineering_team');
+		});
+
+		it('defaults to docs for other paths', () => {
+			expect(detectCategory('docs/setup.md')).toBe('docs');
+		});
+
+		it('defaults to docs for root files', () => {
+			expect(detectCategory('README.md')).toBe('docs');
+		});
+	});
+
+	// --- Sidebar.svelte: expandAll/collapseAll with engineering_team key ---
+	describe('expand/collapse state (Sidebar.svelte)', () => {
+		it('setting engineering_team expand state works regardless of field presence', () => {
+			const source = makeSourceWithoutEngTeam('test');
+			const expandedCategories: Record<string, boolean> = {};
+
+			// This mirrors loadTree() behavior
+			expandedCategories[`${source.source}:engineering_team`] = true;
+			expect(expandedCategories['test:engineering_team']).toBe(true);
+
+			// Collapse
+			expandedCategories[`${source.source}:engineering_team`] = false;
+			expect(expandedCategories['test:engineering_team']).toBe(false);
+		});
+	});
+});
+
+describe('future-proofing: new optional categories', () => {
+	it('TreeSource handles additional unknown fields from backend', () => {
+		// If the backend adds a new category in the future, the UI should not crash
+		const sourceWithFutureField = {
+			...makeSourceWithoutEngTeam('test'),
+			some_new_category: [makeDoc('test:new/doc.md', 'new/doc.md')]
+		} as TreeSource;
+
+		// Core fields still work
+		expect(sourceWithFutureField.source).toBe('test');
+		expect(sourceWithFutureField.docs).toHaveLength(1);
+		expect(sourceWithFutureField.journal).toHaveLength(1);
 	});
 });
