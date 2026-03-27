@@ -11,7 +11,7 @@ export async function proxyGet(path: string): Promise<Response> {
 			status: res.status,
 			headers: { 'Content-Type': 'application/json' }
 		});
-	} catch (err) {
+	} catch {
 		return new Response(
 			JSON.stringify({ error: 'Backend unavailable' }),
 			{ status: 502, headers: { 'Content-Type': 'application/json' } }

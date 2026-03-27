@@ -13,6 +13,7 @@
  let sidebarOpen = $state(false);
  let chatOpen = $state(false);
  let chatExpanded = $state(false);
+ // eslint-disable-next-line svelte/prefer-writable-derived
  let darkMode = $state(false);
 
  const isMobile = new MediaQuery("max-width: 768px");

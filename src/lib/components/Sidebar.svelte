@@ -2,7 +2,7 @@
  import { fetchTree, searchDocuments, type TreeSource, type SearchResult } from "$lib/api";
  import { currentDocId } from "$lib/stores.svelte";
  import { sourceColorClass } from "$lib/colors";
- import { page } from "$app/state";
+
 
  let { onNavigate = () => {} }: { onNavigate?: () => void } = $props();
 
