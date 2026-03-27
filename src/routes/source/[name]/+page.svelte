@@ -1,6 +1,6 @@
 <script lang="ts">
  import { page } from "$app/state";
- import { fetchTree, type TreeSource, type TreeDocument } from "$lib/api";
+ import { fetchTree, type TreeSource } from "$lib/api";
  import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
  import { currentDocId } from "$lib/stores.svelte";
 
