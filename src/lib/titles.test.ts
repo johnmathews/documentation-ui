@@ -43,8 +43,14 @@ describe("displayTitle edge cases", () => {
   expect(displayTitle({ title: null, file_path: ".engineering-team/evaluation-report.md" })).toBe("Evaluation Report");
  });
 
- it("keeps short acronyms uppercase in filename", () => {
-  expect(displayTitle({ title: null, file_path: "API_GUIDE.md" })).toBe("API Guide");
+ it("keeps short acronyms uppercase in non-root filename", () => {
+  expect(displayTitle({ title: null, file_path: "docs/API_GUIDE.md" })).toBe("API Guide");
+ });
+
+ it("uses raw filename for root-level files", () => {
+  expect(displayTitle({ title: null, file_path: "README.md" })).toBe("README.md");
+  expect(displayTitle({ title: null, file_path: "CLAUDE.md" })).toBe("CLAUDE.md");
+  expect(displayTitle({ title: "Some Project Title", file_path: "README.md" })).toBe("README.md");
  });
 
  it("prefers title over filename when title is present", () => {
@@ -65,12 +71,12 @@ describe("displayTitle edge cases", () => {
   ).toBe("Readme");
  });
 
- it("falls back to filename when title ends with .md", () => {
+ it("returns raw filename for root file even when title ends with .md", () => {
   expect(
    displayTitle({
     title: "readme.md",
     file_path: "readme.md",
    }),
-  ).toBe("Readme");
+  ).toBe("readme.md");
  });
 });

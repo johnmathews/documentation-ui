@@ -46,24 +46,29 @@ describe("displayTitle", () => {
   expect(displayTitle({ title: null, file_path: "docs/my-doc.md" })).toBe("My Doc");
  });
 
- it("handles file at root", () => {
-  expect(displayTitle({ title: null, file_path: "readme.md" })).toBe("Readme");
+ it("uses raw filename for root-level files", () => {
+  expect(displayTitle({ title: null, file_path: "readme.md" })).toBe("readme.md");
  });
 
  it("strips date prefix and normalises", () => {
   expect(displayTitle({ title: null, file_path: "docs/250321-fix-stuff.md" })).toBe("Fix Stuff");
  });
 
- it("converts underscored ALL_CAPS to Title Case", () => {
-  expect(displayTitle({ title: null, file_path: "SDK_DEEP_DIVE.md" })).toBe("SDK Deep Dive");
+ it("converts underscored ALL_CAPS to Title Case for non-root files", () => {
+  expect(displayTitle({ title: null, file_path: "docs/SDK_DEEP_DIVE.md" })).toBe("SDK Deep Dive");
  });
 
- it("keeps short acronyms uppercase", () => {
-  expect(displayTitle({ title: null, file_path: "API_DOCS.md" })).toBe("API Docs");
+ it("keeps short acronyms uppercase for non-root files", () => {
+  expect(displayTitle({ title: null, file_path: "docs/API_DOCS.md" })).toBe("API Docs");
  });
 
- it("normalises hyphenated names", () => {
-  expect(displayTitle({ title: null, file_path: "apple-container-networking.md" })).toBe("Apple Container Networking");
+ it("normalises hyphenated names for non-root files", () => {
+  expect(displayTitle({ title: null, file_path: "docs/apple-container-networking.md" })).toBe("Apple Container Networking");
+ });
+
+ it("returns raw filename for root-level files regardless of title", () => {
+  expect(displayTitle({ title: "Some Title", file_path: "CLAUDE.md" })).toBe("CLAUDE.md");
+  expect(displayTitle({ title: "Some Title", file_path: "README.md" })).toBe("README.md");
  });
 });
 

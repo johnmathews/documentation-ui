@@ -43,6 +43,12 @@ export function displaySource(name: string): string {
  * stripping date prefixes (YYMMDD-), and converting to Title Case.
  */
 export function displayTitle(doc: { title: string | null; file_path: string }): string {
+ // Root-level files: use filename with extension (e.g. "README.md", "CLAUDE.md")
+ // to distinguish them since they often share the same title metadata.
+ if (!doc.file_path.includes("/")) {
+  return doc.file_path;
+ }
+
  // Use title if it looks like a real title (not just a filename)
  if (doc.title && !doc.title.includes("/") && !doc.title.endsWith(".md")) {
   return doc.title;

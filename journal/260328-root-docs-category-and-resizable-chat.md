@@ -68,6 +68,13 @@ Reorganized the service navigation bar:
 Improved the journal entry row layout to: day-of-month | app tag | title (right-aligned).
 Since entries are already grouped under month headers, the full date was redundant — now
 only shows the day number. Removed left/right padding on entry cards for tighter alignment.
+Day numbers are hidden with `visibility: hidden` on duplicate days so column alignment is preserved.
+
+## Root Docs Title Convention
+
+Root-level files (README.md, CLAUDE.md) now display their raw filename including extension
+instead of using title metadata or normalised names. This prevents confusion when multiple
+projects have root docs with identical titles (e.g. both README.md files titled "sv").
 
 ## Prettier Configuration
 
