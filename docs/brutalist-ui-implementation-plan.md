@@ -14,20 +14,20 @@ All design decisions (colors, typography, spacing, responsive breakpoints, compo
 
 ## Files to Modify
 
-| File | Change Type | Scope |
-|------|-------------|-------|
-| `src/app.css` | Major rewrite | New variables, typography, markdown styles, breakpoints |
-| `src/lib/colors.ts` | Rewrite | Light/dark mode tag color pairs |
-| `src/routes/+layout.svelte` | Major restyle | Header, layout grid, responsive breakpoints, panels |
-| `src/lib/components/Sidebar.svelte` | Restyle | Tree, search, tags, active states |
-| `src/lib/components/ChatPanel.svelte` | Restyle | Message bubbles, input, header |
-| `src/lib/components/Breadcrumbs.svelte` | Minor restyle | Font sizes, colors |
-| `src/routes/+page.svelte` | Restyle | Source cards grid, stats |
-| `src/routes/doc/[id]/+page.svelte` | Restyle | Document header, metadata, spinner |
-| `src/routes/journal/+page.svelte` | Restyle | Timeline, month groups, entry cards |
-| `src/routes/source/[name]/+page.svelte` | Restyle | Source overview, doc lists |
-| `src/routes/source/[name]/[category]/+page.svelte` | Restyle | Category filter, doc lists |
-| `src/app.html` | Minor | Ensure theme script works with new variable names |
+| File                                               | Change Type   | Scope                                                   |
+|------------------------------------------------------|---------------|---------------------------------------------------------|
+| `src/app.css`                                        | Major rewrite | New variables, typography, markdown styles, breakpoints |
+| `src/lib/colors.ts`                                  | Rewrite       | Light/dark mode tag color pairs                         |
+| `src/routes/+layout.svelte`                          | Major restyle | Header, layout grid, responsive breakpoints, panels     |
+| `src/lib/components/Sidebar.svelte`                  | Restyle       | Tree, search, tags, active states                       |
+| `src/lib/components/ChatPanel.svelte`                | Restyle       | Message bubbles, input, header                          |
+| `src/lib/components/Breadcrumbs.svelte`              | Minor restyle | Font sizes, colors                                      |
+| `src/routes/+page.svelte`                            | Restyle       | Source cards grid, stats                                |
+| `src/routes/doc/[id]/+page.svelte`                   | Restyle       | Document header, metadata, spinner                      |
+| `src/routes/journal/+page.svelte`                    | Restyle       | Timeline, month groups, entry cards                     |
+| `src/routes/source/[name]/+page.svelte`              | Restyle       | Source overview, doc lists                              |
+| `src/routes/source/[name]/[category]/+page.svelte`   | Restyle       | Category filter, doc lists                              |
+| `src/app.html`                                       | Minor         | Ensure theme script works with new variable names       |
 
 **No new files created** (except potentially a `src/lib/theme.ts` if the theme toggle logic needs cleanup for Svelte 5 runes, but likely unnecessary).
 
@@ -108,14 +108,14 @@ New: Refactor to CSS class approach.
 
 **Approved source tag colors:**
 
-| Color | Light BG | Light Text | Dark BG | Dark Text |
-|-------|----------|------------|---------|-----------|
-| Blue | `#d4e4f7` | `#0f385c` | `#163d6b` | `#7db8e8` |
-| Green | `#cce8dc` | `#083d29` | `#0d4f35` | `#6ccda5` |
-| Purple | `#ddd6ef` | `#2a1950` | `#3a2570` | `#a694d4` |
-| Orange | `#fde3cf` | `#7a3c1c` | `#8f4a24` | `#f4b07a` |
-| Teal | `#c9e8e9` | `#0b4144` | `#105558` | `#6dd4d8` |
-| Red | `#f5d0d0` | `#651b1b` | `#7a2424` | `#f09090` |
+| Color  | Light BG  | Light Text | Dark BG   | Dark Text |
+|--------|-----------|------------|-----------|-----------|
+| Blue   | `#d4e4f7` | `#0f385c`  | `#163d6b` | `#7db8e8` |
+| Green  | `#cce8dc` | `#083d29`  | `#0d4f35` | `#6ccda5` |
+| Purple | `#ddd6ef` | `#2a1950`  | `#3a2570` | `#a694d4` |
+| Orange | `#fde3cf` | `#7a3c1c`  | `#8f4a24` | `#f4b07a` |
+| Teal   | `#c9e8e9` | `#0b4144`  | `#105558` | `#6dd4d8` |
+| Red    | `#f5d0d0` | `#651b1b`  | `#7a2424` | `#f09090` |
 
 **Implementation:** Define CSS classes `.tag-blue`, `.tag-green`, etc. in `app.css` with theme-aware colors under both `:root` (dark) and `[data-theme="light"]`. The `colors.ts` function becomes `sourceColorClass(name: string): string` returning a class name like `'tag-blue'`. Components change from `style="background: {bg}; color: {text}"` to `class={sourceColorClass(name)}`. This makes theme switching automatic via CSS -- no JS theme detection needed.
 
@@ -141,11 +141,11 @@ New breakpoints: 640px (mobile), 769px (desktop/sidebar), 1200px (wide/three-pan
 
 **Breakpoint summary:**
 
-| Range | Sidebar | Chat | Layout |
-|-------|---------|------|--------|
-| 0-768px | Overlay | Overlay | Single column |
-| 769-1199px | Persistent 280px | Overlay | Two column |
-| 1200px+ | Persistent 280px | Persistent 360px | Three column |
+| Range      | Sidebar          | Chat             | Layout        |
+|------------|------------------|------------------|---------------|
+| 0-768px    | Overlay          | Overlay          | Single column |
+| 769-1199px | Persistent 280px | Overlay          | Two column    |
+| 1200px+    | Persistent 280px | Persistent 360px | Three column  |
 
 **Chat panel behavior change:** Currently persistent on desktop (>1024px), overlay below. New: overlay until 1200px. Desktop users at 1024-1199px get chat as overlay. Deliberate -- two columns (sidebar + content) need the space.
 

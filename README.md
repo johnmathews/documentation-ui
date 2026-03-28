@@ -1,44 +1,66 @@
-# sv
+# Documentation UI
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A web interface for browsing, searching, and chatting with documentation indexed by the [documentation MCP server](https://github.com/johnmathews/documentation-mcp-server). Built with SvelteKit and styled after the GOV.UK Design System.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Tree navigation** — Browse documents organized by source, then by category (Root Docs, Documentation Directory, Journal, Engineering Analysis). Collapsible categories with document counts and filterable via checkboxes.
+- **Semantic search** — Debounced full-text search across all indexed documentation via ChromaDB.
+- **RAG chat** — Ask questions about your docs. Claude retrieves relevant context and responds with cited answers. The chat panel is aware of the currently viewed document.
+- **Journal timeline** — Cross-project chronological view of all journal entries at `/journal`.
+- **Print view** — Print button in the top bar produces clean output: all chrome hidden, compact 12pt typography, light colours forced, page break control on code blocks and headings.
+- **Responsive** — Desktop 3-panel layout, tablet overlay drawers, mobile full-screen panels with swipe gestures and 44px touch targets.
+- **Dark mode** — Toggle in the top bar, persisted to localStorage.
+- **Resizable panels** — Both the sidebar and chat panel are drag-resizable on desktop, with widths persisted to localStorage.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Quick Start
 
-To recreate this project with the same configuration:
+Requires the documentation MCP server running locally (default port 8080).
 
-```sh
-# recreate this project
-npx sv@0.12.8 create --template minimal --types ts --no-install documentation-ui
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a
-development server:
-
-```sh
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+The dev server starts at `http://localhost:5173` and proxies API requests to the backend configured in `.env`:
 
-To create a production version of your app:
-
-```sh
-npm run build
+```
+API_URL=http://localhost:8080
 ```
 
-You can preview the production build with `npm run preview`.
+## Docker Deployment
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target
-> environment.
+Both services run in the same docker-compose stack:
+
+```bash
+docker compose up -d
+```
+
+| Service                        | Internal Port | Mapped Port |
+|--------------------------------|---------------|-------------|
+| `docserver` (MCP server)       | 8080          | 8085        |
+| `documentation-ui` (this app)  | 3000          | 3002        |
+
+The UI connects to the backend via the Docker network at `http://docserver:8080`. The Docker image is built and pushed to `ghcr.io/johnmathews/documentation-ui` on every push to `main`.
+
+## Commands
+
+| Command           | Description                      |
+|-------------------|----------------------------------|
+| `npm run dev`     | Start dev server with HMR        |
+| `npm run build`   | Production build                 |
+| `npm run preview` | Preview production build locally |
+| `npm test`        | Run test suite (vitest)          |
+| `npm run lint`    | Run ESLint                       |
+
+## Environment Variables
+
+| Variable            | Where        | Description                                    |
+|---------------------|--------------|------------------------------------------------|
+| `API_URL`           | UI container | Backend URL (default: `http://localhost:8085`)  |
+| `ANTHROPIC_API_KEY` | MCP server   | Required for the chat/RAG endpoint             |
+| `PORT`              | UI container | Server port (default: `3000`)                  |
+
+## Architecture
+
+SvelteKit with adapter-node for Docker deployment. Server-side routes proxy all `/api/*` requests to the MCP server backend, eliminating CORS concerns and keeping the backend URL as a runtime config. See [docs/architecture.md](docs/architecture.md) for full details.

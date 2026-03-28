@@ -55,19 +55,19 @@ Principles 1, 4, 6, 7, and 9 are most directly applicable. The design should pri
 
 Each group has: primary, tint-25, tint-50, tint-80, tint-95, shade-25, shade-50.
 
-| Group | Primary | Tint-95 (lightest) | Shade-50 (darkest) |
-|-------|---------|---------------------|---------------------|
-| **Blue** | `#1d70b8` | `#f4f8fb` | `#0f385c` |
-| **Green** | `#0f7a52` | `#f3f8f6` | `#083d29` |
-| **Teal** | `#158187` | `#f3f9f9` | `#0b4144` |
-| **Purple** | `#54319f` | `#f6f5fa` | `#2a1950` |
-| **Magenta** | `#ca357c` | `#fcf5f8` | `#651b3e` |
-| **Red** | `#ca3535` | `#fcf5f5` | `#651b1b` |
-| **Orange** | `#f47738` | `#fef8f5` | `#7a3c1c` |
-| **Yellow** | `#ffdd00` | `#fffdf2` | `#806f00` |
-| **Brown** | `#99704a` | `#faf8f6` | -- |
-| **Black** | `#0b0c0c` | `#f3f3f3` | -- |
-| **White** | `#ffffff` | -- | -- |
+| Group       | Primary   | Tint-95 (lightest) | Shade-50 (darkest) |
+|-------------|-----------|--------------------|--------------------|
+| **Blue**    | `#1d70b8` | `#f4f8fb`          | `#0f385c`          |
+| **Green**   | `#0f7a52` | `#f3f8f6`          | `#083d29`          |
+| **Teal**    | `#158187` | `#f3f9f9`          | `#0b4144`          |
+| **Purple**  | `#54319f` | `#f6f5fa`          | `#2a1950`          |
+| **Magenta** | `#ca357c` | `#fcf5f8`          | `#651b3e`          |
+| **Red**     | `#ca3535` | `#fcf5f5`          | `#651b1b`          |
+| **Orange**  | `#f47738` | `#fef8f5`          | `#7a3c1c`          |
+| **Yellow**  | `#ffdd00` | `#fffdf2`          | `#806f00`          |
+| **Brown**   | `#99704a` | `#faf8f6`          | --                 |
+| **Black**   | `#0b0c0c` | `#f3f3f3`          | --                 |
+| **White**   | `#ffffff` | --                 | --                 |
 
 ### Key Colour Rules
 - WCAG 2.2 AA minimum contrast ratio required (4.5:1 for text)
@@ -95,27 +95,27 @@ The type scale changes between small screens (<640px) and large screens (>=640px
 
 **Large screens (>=640px tablet breakpoint):**
 
-| Scale Point | Used by | Font Size | Line Height |
-|-------------|---------|-----------|-------------|
-| 80 | Exceptional only | 80px | 80px |
-| 48 | `govuk-heading-xl` | 48px | 50px |
-| 36 | `govuk-heading-l` | 36px | 40px |
-| 27 | Exceptional only | 27px | 30px |
-| 24 | `govuk-heading-m`, `govuk-body-l` | 24px | 30px |
-| 19 | `govuk-heading-s`, `govuk-body` | 19px | 25px |
-| 16 | `govuk-body-s` | 16px | 20px |
+| Scale Point | Used by                            | Font Size | Line Height |
+|-------------|------------------------------------|-----------|-------------|
+| 80          | Exceptional only                   | 80px      | 80px        |
+| 48          | `govuk-heading-xl`                 | 48px      | 50px        |
+| 36          | `govuk-heading-l`                  | 36px      | 40px        |
+| 27          | Exceptional only                   | 27px      | 30px        |
+| 24          | `govuk-heading-m`, `govuk-body-l`  | 24px      | 30px        |
+| 19          | `govuk-heading-s`, `govuk-body`    | 19px      | 25px        |
+| 16          | `govuk-body-s`                     | 16px      | 20px        |
 
 **Small screens (<640px):**
 
-| Scale Point | Font Size | Line Height |
-|-------------|-----------|-------------|
-| 80 | 53px | 55px |
-| 48 | 32px | 35px |
-| 36 | 27px | 30px |
-| 27 | 21px | 25px |
-| 24 | 21px | 25px |
-| 19 | 19px (unchanged) | 25px |
-| 16 | 16px (unchanged) | 20px |
+| Scale Point | Font Size        | Line Height |
+|-------------|------------------|-------------|
+| 80          | 53px             | 55px        |
+| 48          | 32px             | 35px        |
+| 36          | 27px             | 30px        |
+| 27          | 21px             | 25px        |
+| 24          | 21px             | 25px        |
+| 19          | 19px (unchanged) | 25px        |
+| 16          | 16px (unchanged) | 20px        |
 
 ### Key Typography Rules
 - Line heights are always multiples of 5px for consistent vertical rhythm
@@ -157,32 +157,32 @@ For showing context above headings (e.g. section name above page title):
 ### Responsive Spacing Scale (adapts at 640px breakpoint)
 
 | Unit | Small screens | Large screens |
-|------|--------------|---------------|
-| 0 | 0 | 0 |
-| 1 | 5px | 5px |
-| 2 | 10px | 10px |
-| 3 | 15px | 15px |
-| 4 | 15px | 20px |
-| 5 | 15px | 25px |
-| 6 | 20px | 30px |
-| 7 | 25px | 40px |
-| 8 | 30px | 50px |
-| 9 | 40px | 60px |
+|------|---------------|---------------|
+| 0    | 0             | 0             |
+| 1    | 5px           | 5px           |
+| 2    | 10px          | 10px          |
+| 3    | 15px          | 15px          |
+| 4    | 15px          | 20px          |
+| 5    | 15px          | 25px          |
+| 6    | 20px          | 30px          |
+| 7    | 25px          | 40px          |
+| 8    | 30px          | 50px          |
+| 9    | 40px          | 60px          |
 
 ### Static Spacing Scale (same at all sizes)
 
 | Unit | Value |
 |------|-------|
-| 0 | 0 |
-| 1 | 5px |
-| 2 | 10px |
-| 3 | 15px |
-| 4 | 20px |
-| 5 | 25px |
-| 6 | 30px |
-| 7 | 40px |
-| 8 | 50px |
-| 9 | 60px |
+| 0    | 0     |
+| 1    | 5px   |
+| 2    | 10px  |
+| 3    | 15px  |
+| 4    | 20px  |
+| 5    | 25px  |
+| 6    | 30px  |
+| 7    | 40px  |
+| 8    | 50px  |
+| 9    | 60px  |
 
 ### Key Spacing Rules
 - Base unit is 5px; all spacing is a multiple of 5
@@ -432,20 +432,20 @@ GOV.UK does not officially implement dark mode, but their architecture makes it 
 
 ### Colour Inversion Strategy
 
-| Light Mode | Dark Mode Equivalent |
-|------------|---------------------|
-| body-background `#ffffff` | `#0b0c0c` or `#1a1a1a` |
-| template-background `#f4f8fb` | `#121820` (shade of blue-95) |
-| text `#0b0c0c` | `#f3f3f3` (black tint-95) |
-| secondary-text `#484949` | `#cecece` (black tint-80) |
-| border `#cecece` | `#484949` |
-| surface-background `#f4f8fb` | `#0f385c` (blue shade-50) or `#1a2332` |
-| surface-border `#8eb8dc` | `#1d70b8` (blue primary) dimmed |
-| link `#1a65a6` | Lighten to tint-25 `#5694ca` |
-| link-visited `#54319f` | Lighten to `#7f65b7` (purple tint-25) |
-| focus `#ffdd00` | Keep `#ffdd00` (works on dark backgrounds) |
-| error `#ca3535` | Keep or lighten slightly |
-| success `#0f7a52` | Keep or lighten slightly |
+| Light Mode                      | Dark Mode Equivalent                         |
+|---------------------------------|----------------------------------------------|
+| body-background `#ffffff`       | `#0b0c0c` or `#1a1a1a`                       |
+| template-background `#f4f8fb`   | `#121820` (shade of blue-95)                 |
+| text `#0b0c0c`                  | `#f3f3f3` (black tint-95)                    |
+| secondary-text `#484949`        | `#cecece` (black tint-80)                    |
+| border `#cecece`                | `#484949`                                    |
+| surface-background `#f4f8fb`    | `#0f385c` (blue shade-50) or `#1a2332`       |
+| surface-border `#8eb8dc`        | `#1d70b8` (blue primary) dimmed              |
+| link `#1a65a6`                  | Lighten to tint-25 `#5694ca`                 |
+| link-visited `#54319f`          | Lighten to `#7f65b7` (purple tint-25)        |
+| focus `#ffdd00`                 | Keep `#ffdd00` (works on dark backgrounds)   |
+| error `#ca3535`                 | Keep or lighten slightly                     |
+| success `#0f7a52`               | Keep or lighten slightly                     |
 
 ### Principles for Dark Mode Adaptation
 1. Use functional colour tokens, NOT raw hex values -- this is what GOV.UK already recommends

@@ -8,14 +8,14 @@ The documentation UI works well on desktop with its 3-panel layout (sidebar, con
 
 ## Assessment Dimensions
 
-| Dimension | Rating | Notes |
-|-----------|--------|-------|
-| Desktop UX | 4/5 | Clean 3-panel layout, works great |
-| Mobile touch targets | 0/5 | Every interactive element fails 44x44px minimum |
-| Mobile layout | 2/5 | Basic breakpoints exist but panels need rethinking |
-| Mobile navigation | 1/5 | No backdrop/scrim, no swipe, sidebar covers everything |
-| Responsive typography | 1/5 | Fixed font sizes, h1 at 28px looks huge on 375px screens |
-| Safe area handling | 0/5 | No env(safe-area-inset-*) for notched devices |
+| Dimension             | Rating | Notes                                                    |
+|-----------------------|--------|----------------------------------------------------------|
+| Desktop UX            | 4/5    | Clean 3-panel layout, works great                        |
+| Mobile touch targets  | 0/5    | Every interactive element fails 44x44px minimum          |
+| Mobile layout         | 2/5    | Basic breakpoints exist but panels need rethinking       |
+| Mobile navigation     | 1/5    | No backdrop/scrim, no swipe, sidebar covers everything   |
+| Responsive typography | 1/5    | Fixed font sizes, h1 at 28px looks huge on 375px screens |
+| Safe area handling    | 0/5    | No env(safe-area-inset-*) for notched devices            |
 
 ---
 
@@ -27,19 +27,19 @@ Apple HIG requires 44x44px minimum. Material Design requires 48x48dp. WCAG 2.2 A
 
 **Current state: Every interactive element fails all three standards.**
 
-| Element | File | Computed Size | Required |
-|---------|------|---------------|----------|
-| Hamburger button | `+layout.svelte:38` | 29x29px | 44x44px |
-| Theme toggle | `+layout.svelte:46` | 27x27px | 44x44px |
-| Chat toggle | `+layout.svelte:57` | 29px tall | 44x44px |
-| Sidebar tree items | `Sidebar.svelte:193` | 30px tall | 44x44px |
-| Sidebar tree toggles | `Sidebar.svelte:179` | 31px tall | 44x44px |
-| Expand/collapse btn | `Sidebar.svelte:157` | 22x22px | 44x44px |
-| Chat header buttons | `ChatPanel.svelte:126-151` | 22x22px | 44x44px |
-| Send button | `ChatPanel.svelte:212` | 30x30px | 44x44px |
-| Doc list links | `source/[name]/+page.svelte:71` | 20px tall | 44x44px |
-| Breadcrumb links | `Breadcrumbs.svelte:10` | 11px tall | 44x44px |
-| Source badge | `doc/[id]/+page.svelte:83` | 13px tall | 44x44px |
+| Element              | File                            | Computed Size | Required |
+|----------------------|---------------------------------|---------------|----------|
+| Hamburger button     | `+layout.svelte:38`             | 29x29px       | 44x44px  |
+| Theme toggle         | `+layout.svelte:46`             | 27x27px       | 44x44px  |
+| Chat toggle          | `+layout.svelte:57`             | 29px tall     | 44x44px  |
+| Sidebar tree items   | `Sidebar.svelte:193`            | 30px tall     | 44x44px  |
+| Sidebar tree toggles | `Sidebar.svelte:179`            | 31px tall     | 44x44px  |
+| Expand/collapse btn  | `Sidebar.svelte:157`            | 22x22px       | 44x44px  |
+| Chat header buttons  | `ChatPanel.svelte:126-151`      | 22x22px       | 44x44px  |
+| Send button          | `ChatPanel.svelte:212`          | 30x30px       | 44x44px  |
+| Doc list links       | `source/[name]/+page.svelte:71` | 20px tall     | 44x44px  |
+| Breadcrumb links     | `Breadcrumbs.svelte:10`         | 11px tall     | 44x44px  |
+| Source badge         | `doc/[id]/+page.svelte:83`      | 13px tall     | 44x44px  |
 
 **Impact:** On a phone, users must aim precisely at tiny targets with their thumbs. This causes frequent mis-taps, especially in the sidebar tree where items are densely packed.
 
@@ -71,13 +71,13 @@ Apple HIG requires 44x44px minimum. Material Design requires 48x48dp. WCAG 2.2 A
 
 ### 4. Horizontal Overflow Risks (MEDIUM)
 
-| Issue | File:Line | Description |
-|-------|-----------|-------------|
-| Sources grid | `+page.svelte:122` | `minmax(380px, 1fr)` can overflow between 380-640px viewports |
-| Doc metadata row | `doc/[id]/+page.svelte:152` | Flex row with source badge + monospace file path, no wrap |
-| Doc dates row | `doc/[id]/+page.svelte:188` | Flex row, no `flex-wrap` for narrow screens |
-| Doc list items | `source/[name]/+page.svelte:110` | Flex row with title + date, no mobile stack |
-| Markdown tables | `app.css:161` | `width: 100%` but no `overflow-x` wrapper, wide tables overflow |
+| Issue            | File:Line                        | Description                                                      |
+|------------------|----------------------------------|------------------------------------------------------------------|
+| Sources grid     | `+page.svelte:122`               | `minmax(380px, 1fr)` can overflow between 380-640px viewports    |
+| Doc metadata row | `doc/[id]/+page.svelte:152`      | Flex row with source badge + monospace file path, no wrap        |
+| Doc dates row    | `doc/[id]/+page.svelte:188`      | Flex row, no `flex-wrap` for narrow screens                      |
+| Doc list items   | `source/[name]/+page.svelte:110` | Flex row with title + date, no mobile stack                      |
+| Markdown tables  | `app.css:161`                    | `width: 100%` but no `overflow-x` wrapper, wide tables overflow  |
 
 ### 5. Typography (MEDIUM)
 

@@ -49,8 +49,8 @@ The UI connects to the backend via the internal Docker network using `http://doc
 
 ## Environment Variables
 
-| Variable | Where | Description |
-|----------|-------|-------------|
-| `API_URL` | UI container | Backend URL (default: `http://localhost:8085`) |
-| `ANTHROPIC_API_KEY` | MCP server | Required for the chat endpoint |
-| `PORT` | UI container | Server port (default: `3000`) |
+| Variable            | Where        | Description                                    |
+|---------------------|--------------|------------------------------------------------|
+| `API_URL`           | UI container | Backend URL (default: `http://localhost:8085`)  |
+| `ANTHROPIC_API_KEY` | MCP server   | Required for the chat endpoint                 |
+| `PORT`              | UI container | Server port (default: `3000`)                  |
