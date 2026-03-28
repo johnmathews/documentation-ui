@@ -183,6 +183,11 @@
       </svg>
      {/if}
     </button>
+    <a href="/status" class="govuk-header__action-btn" title="Server status">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+     </svg>
+    </a>
     <button class="govuk-header__action-btn" onclick={() => window.print()} title="Print page">
      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="6 9 6 2 18 2 18 9" />
@@ -235,11 +240,6 @@
     <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/engineering-team"}>
      <a href="/engineering-team" class="govuk-service-nav__link">
       {#if currentPath === "/engineering-team"}<strong>Engineering Team</strong>{:else}Engineering Team{/if}
-     </a>
-    </li>
-    <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/status"}>
-     <a href="/status" class="govuk-service-nav__link">
-      {#if currentPath === "/status"}<strong>Status</strong>{:else}Status{/if}
      </a>
     </li>
    </ul>
