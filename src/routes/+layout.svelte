@@ -18,31 +18,6 @@
 
  const isMobile = new MediaQuery("max-width: 768px");
 
- // Sidebar resize
- let sidebarWidth = $state(400);
- let isResizing = $state(false);
-
- function handleResizeStart(e: MouseEvent) {
-  e.preventDefault();
-  isResizing = true;
-  const startX = e.clientX;
-  const startWidth = sidebarWidth;
-
-  function onMove(e: MouseEvent) {
-   sidebarWidth = Math.max(280, Math.min(800, startWidth + (e.clientX - startX)));
-  }
-
-  function onUp() {
-   isResizing = false;
-   document.removeEventListener('mousemove', onMove);
-   document.removeEventListener('mouseup', onUp);
-   localStorage.setItem('sidebar-width', String(sidebarWidth));
-  }
-
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
- }
-
  let touchStartX = 0;
  let touchStartY = 0;
  let touchStartTime = 0;
@@ -80,14 +55,13 @@
 
  onMount(() => {
   if (isMobile.current) sidebarOpen = false;
+  // Measure actual header height and set CSS variable
   const header = document.querySelector('.govuk-header');
   const nav = document.querySelector('.govuk-service-nav');
   if (header && nav) {
    const h = header.getBoundingClientRect().height + nav.getBoundingClientRect().height;
    document.documentElement.style.setProperty('--header-height', `${h}px`);
   }
-  const saved = localStorage.getItem('sidebar-width');
-  if (saved) sidebarWidth = Math.max(280, Math.min(800, parseInt(saved, 10) || 400));
  });
 
  $effect(() => {
@@ -195,16 +169,12 @@
 </div>
 
 <!-- Panels outside the layout flow — fixed overlays at viewport level -->
-<aside class="sidebar" class:open={sidebarOpen} class:resizing={isResizing} style="width: {isMobile.current ? '100%' : sidebarWidth + 'px'}" aria-hidden={!sidebarOpen}>
+<aside class="sidebar" class:open={sidebarOpen} aria-hidden={!sidebarOpen}>
  <Sidebar
   onNavigate={() => {
    if (window.innerWidth <= 768) sidebarOpen = false;
   }}
  />
- {#if !isMobile.current}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="sidebar-resize-handle" onmousedown={handleResizeStart}></div>
- {/if}
 </aside>
 
 <aside class="chat-panel" class:expanded={chatExpanded} class:hidden={!chatOpen}>
@@ -443,6 +413,7 @@
   top: var(--header-height);
   left: 0;
   bottom: 0;
+  width: var(--sidebar-width);
   z-index: 200;
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
@@ -455,26 +426,6 @@
 
  .sidebar.open {
   display: flex;
- }
-
- .sidebar.resizing {
-  user-select: none;
- }
-
- .sidebar-resize-handle {
-  position: absolute;
-  top: 0;
-  right: -3px;
-  width: 6px;
-  height: 100%;
-  cursor: col-resize;
-  z-index: 201;
- }
-
- .sidebar-resize-handle:hover,
- .sidebar.resizing .sidebar-resize-handle {
-  background: var(--brand);
-  opacity: 0.4;
  }
 
  .content {
