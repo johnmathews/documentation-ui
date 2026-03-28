@@ -69,6 +69,16 @@ Improved the journal entry row layout to: day-of-month | app tag | title (right-
 Since entries are already grouped under month headers, the full date was redundant — now
 only shows the day number. Removed left/right padding on entry cards for tighter alignment.
 
+## Prettier Configuration
+
+Added `.prettierrc` to the project to stop Neovim's `prettierd` from reverting edits.
+The global `~/.prettierrc` (tabWidth 1, proseWrap always, printWidth 121) was being
+picked up, but without the Svelte parser plugin `.svelte` files were handled
+inconsistently. Added `prettier` and `prettier-plugin-svelte` as dev dependencies
+and ran a full format pass across all source files so the codebase matches Prettier
+output. Future edits from any tool (Claude Code, Neovim, CI) will produce identical
+formatting.
+
 ## Test Suite Expansion
 
 Added 60 new tests (43→103 total):
