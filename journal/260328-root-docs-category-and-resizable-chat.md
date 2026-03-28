@@ -86,11 +86,34 @@ and ran a full format pass across all source files so the codebase matches Prett
 output. Future edits from any tool (Claude Code, Neovim, CI) will produce identical
 formatting.
 
+## Server Status Page
+
+Added `/status` page showing backend health, per-source indexing stats (file count, chunk count,
+last indexed timestamp with relative time), totals row, health badge, and refresh button.
+Proxied via `/api/health` to the backend's `/health` endpoint. Added "Status" link to
+service nav bar.
+
+## Docker Image Size Reduction
+
+Replaced `COPY node_modules` with `npm ci --omit=dev` in production Dockerfile stage.
+Reduces image from ~468MB to ~318MB by excluding 19 dev dependencies (vitest, eslint,
+typescript, svelte compiler, etc.) that aren't needed at runtime.
+
+## Chat Prompt Testing (MCP Server)
+
+Extracted `build_inventory_context` and `build_system_prompt` from the inline chat endpoint
+into testable pure functions. Added 32 tests covering:
+- System instructions contain all critical phrases (confident answers, inventory awareness)
+- Inventory builder includes all 4 categories, per-source stats, handles missing data
+- Full prompt assembly with inventory + RAG context
+
 ## Test Suite Expansion
 
-Added 60 new tests (43→103 total):
+Added 60 new tests (43→105 total) in documentation-ui:
 - `print-css.test.ts` (36 tests): Parses app.css and asserts all critical print rules exist
   with correct values and `!important` flags. Guards against regression.
-- `titles.test.ts` (13 tests): Tests `displaySource` (previously untested) and `displayTitle`
-  edge cases.
+- `titles.test.ts` (15 tests): Tests `displaySource` (previously untested), `displayTitle`
+  edge cases, and root-level filename convention.
 - `stores.test.ts` (11 tests): Tests `CATEGORIES` constant ordering, uniqueness, and labels.
+
+Added 32 new tests in documentation-mcp-server (`test_chat_prompt.py`).

@@ -46,6 +46,20 @@ export interface ChatMessage {
  content: string;
 }
 
+export interface HealthSource {
+ source: string;
+ file_count: number;
+ chunk_count: number;
+ last_indexed: string | null;
+}
+
+export interface HealthStatus {
+ status: string;
+ total_sources: number;
+ total_chunks: number;
+ sources: HealthSource[];
+}
+
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
  const res = await fetch(path, options);
  if (!res.ok) {
@@ -53,6 +67,10 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   throw new Error(body.error || `API error ${res.status}`);
  }
  return res.json();
+}
+
+export async function fetchHealth(): Promise<HealthStatus> {
+ return apiFetch<HealthStatus>("/api/health");
 }
 
 export async function fetchTree(): Promise<TreeSource[]> {

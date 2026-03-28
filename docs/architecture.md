@@ -19,6 +19,7 @@ interface powered by Claude that has full context of the documentation.
 - **Journal Timeline**: Cross-project chronological view of all journal entries at `/journal`
 - **Root Docs**: Cross-project view of root-level files (README, CLAUDE.md) at `/root-docs`, grouped by source
 - **Engineering Team**: Cross-project view of evaluation reports and improvement plans at `/engineering-team`, grouped by source
+- **Server Status**: Admin page at `/status` showing backend health, per-source indexing stats (file count, chunk count, last indexed time), and a refresh button. Proxied via `/api/health`.
 
 ### Server Routes (SvelteKit)
 
@@ -30,6 +31,7 @@ Routes:
 - `GET /api/documents/:id` → proxies to backend `/api/documents/:id`
 - `GET /api/search?q=...` → proxies to backend `/api/search?q=...`
 - `POST /api/chat` → proxies to backend `/api/chat`
+- `GET /api/health` → proxies to backend `/health`
 
 ### Backend (Documentation MCP Server)
 

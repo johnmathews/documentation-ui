@@ -237,6 +237,11 @@
       {#if currentPath === "/engineering-team"}<strong>Engineering Team</strong>{:else}Engineering Team{/if}
      </a>
     </li>
+    <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/status"}>
+     <a href="/status" class="govuk-service-nav__link">
+      {#if currentPath === "/status"}<strong>Status</strong>{:else}Status{/if}
+     </a>
+    </li>
    </ul>
   </div>
  </nav>
