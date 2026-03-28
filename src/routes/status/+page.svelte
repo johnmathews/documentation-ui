@@ -9,6 +9,42 @@
  let error = $state("");
  let refreshing = $state(false);
 
+ type SortKey = "source" | "file_count" | "chunk_count" | "last_indexed";
+ let sortKey: SortKey = $state("source");
+ let sortAsc = $state(true);
+
+ function toggleSort(key: SortKey) {
+  if (sortKey === key) {
+   sortAsc = !sortAsc;
+  } else {
+   sortKey = key;
+   sortAsc = key === "source";
+  }
+ }
+
+ let sortedSources = $derived.by(() => {
+  if (!health) return [];
+  const sorted = [...health.sources].sort((a, b) => {
+   let cmp: number;
+   if (sortKey === "source") {
+    cmp = a.source.localeCompare(b.source);
+   } else if (sortKey === "last_indexed") {
+    const ta = a.last_indexed || "";
+    const tb = b.last_indexed || "";
+    cmp = ta.localeCompare(tb);
+   } else {
+    cmp = (a[sortKey] ?? 0) - (b[sortKey] ?? 0);
+   }
+   return sortAsc ? cmp : -cmp;
+  });
+  return sorted;
+ });
+
+ function sortIndicator(key: SortKey): string {
+  if (sortKey !== key) return "";
+  return sortAsc ? " \u25B2" : " \u25BC";
+ }
+
  $effect(() => {
   currentDocId.value = null;
   loadHealth();
@@ -106,14 +142,26 @@
   <table class="source-table">
    <thead>
     <tr>
-     <th>Source</th>
-     <th class="num">Files</th>
-     <th class="num">Chunks</th>
-     <th>Last Indexed</th>
+     <th><button class="sort-btn" onclick={() => toggleSort("source")}>Source{sortIndicator("source")}</button></th>
+     <th class="num"
+      ><button class="sort-btn sort-btn-right" onclick={() => toggleSort("file_count")}
+       >Files{sortIndicator("file_count")}</button
+      ></th
+     >
+     <th class="num"
+      ><button class="sort-btn sort-btn-right" onclick={() => toggleSort("chunk_count")}
+       >Chunks{sortIndicator("chunk_count")}</button
+      ></th
+     >
+     <th
+      ><button class="sort-btn" onclick={() => toggleSort("last_indexed")}
+       >Last Indexed{sortIndicator("last_indexed")}</button
+      ></th
+     >
     </tr>
    </thead>
    <tbody>
-    {#each health.sources as source}
+    {#each sortedSources as source}
      <tr>
       <td>
        <span class="source-tag {sourceColorClass(source.source)}">{displaySource(source.source)}</span>
@@ -295,6 +343,27 @@
   font-weight: 700;
   padding: 10px 15px 10px 0;
   border-bottom: 2px solid var(--border-strong);
+ }
+
+ .sort-btn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+ }
+
+ .sort-btn:hover {
+  text-decoration: underline;
+ }
+
+ .sort-btn-right {
+  display: block;
+  margin-left: auto;
+  text-align: right;
  }
 
  .source-table td {
