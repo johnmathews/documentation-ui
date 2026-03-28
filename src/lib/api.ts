@@ -7,6 +7,7 @@ export interface TreeSource {
  docs: TreeDocument[];
  journal: TreeDocument[];
  engineering_team?: TreeDocument[];
+ pdf?: TreeDocument[];
 }
 
 export interface TreeDocument {

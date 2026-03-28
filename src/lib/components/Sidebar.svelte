@@ -48,6 +48,7 @@
    expandedCategories[`${s.source}:docs`] = true;
    expandedCategories[`${s.source}:journal`] = true;
    expandedCategories[`${s.source}:engineering_team`] = true;
+   expandedCategories[`${s.source}:pdf`] = true;
   }
  }
 
@@ -58,6 +59,7 @@
    expandedCategories[`${s.source}:docs`] = false;
    expandedCategories[`${s.source}:journal`] = false;
    expandedCategories[`${s.source}:engineering_team`] = false;
+   expandedCategories[`${s.source}:pdf`] = false;
   }
  }
 
@@ -98,6 +100,7 @@
   if (categoryFilters.isVisible("docs")) count += source.docs.length;
   if (categoryFilters.isVisible("journal")) count += source.journal.length;
   if (categoryFilters.isVisible("engineering_team")) count += source.engineering_team?.length ?? 0;
+  if (categoryFilters.isVisible("pdf")) count += source.pdf?.length ?? 0;
   return count;
  }
 
@@ -343,6 +346,42 @@
              <path
               d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
              />
+            </svg>
+            <span class="item-title">{displayTitle(doc)}</span>
+           </a>
+          {/each}
+         </div>
+        {/if}
+       </div>
+      {/if}
+
+      {#if categoryFilters.isVisible("pdf") && (source.pdf?.length ?? 0) > 0}
+       <div class="tree-category">
+        <button class="tree-toggle category-toggle" onclick={() => toggleCategory(`${source.source}:pdf`)}>
+         <svg
+          class="chevron"
+          class:expanded={expandedCategories[`${source.source}:pdf`]}
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+         >
+          <polyline points="9 18 15 12 9 6" />
+         </svg>
+         <span>PDF</span>
+         <span class="count">{source.pdf?.length ?? 0}</span>
+        </button>
+
+        {#if expandedCategories[`${source.source}:pdf`]}
+         <div class="tree-items">
+          {#each source.pdf ?? [] as doc}
+           <a href={docUrl(doc.doc_id)} class="tree-item" class:active={isActive(doc.doc_id)} onclick={onNavigate}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+             <polyline points="14 2 14 8 20 8" />
+             <line x1="9" y1="15" x2="15" y2="15" />
             </svg>
             <span class="item-title">{displayTitle(doc)}</span>
            </a>

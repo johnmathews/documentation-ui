@@ -6,6 +6,7 @@ export const CATEGORIES = [
  { key: "docs", label: "Documentation Directory" },
  { key: "journal", label: "Journal" },
  { key: "engineering_team", label: "Engineering Team" },
+ { key: "pdf", label: "PDF" },
 ] as const;
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];

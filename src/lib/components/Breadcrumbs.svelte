@@ -29,12 +29,12 @@
    {#if title}
     <li class="govuk-breadcrumbs__list-item">
      <a class="govuk-breadcrumbs__link" href="/source/{encodeURIComponent(source)}/{category}"
-      >{category === "journal" ? "Journal" : "Documentation"}</a
+      >{category === "journal" ? "Journal" : category === "pdf" ? "PDF" : "Documentation"}</a
      >
     </li>
    {:else}
     <li class="govuk-breadcrumbs__list-item" aria-current="page">
-     {category === "journal" ? "Journal" : "Documentation"}
+     {category === "journal" ? "Journal" : category === "pdf" ? "PDF" : "Documentation"}
     </li>
    {/if}
   {/if}

@@ -63,6 +63,9 @@
       <span>{source.root_docs.length + source.docs.length} docs</span>
       <span>{source.journal.length} journal entries</span>
       <span>{source.engineering_team?.length ?? 0} engineering analyses</span>
+      {#if (source.pdf?.length ?? 0) > 0}
+       <span>{source.pdf?.length ?? 0} PDFs</span>
+      {/if}
      </div>
 
      {#if source.root_docs.length > 0}
@@ -113,6 +116,20 @@
         {/each}
         {#if (source.engineering_team?.length ?? 0) > 3}
          <li class="more">+{(source.engineering_team?.length ?? 0) - 3} more</li>
+        {/if}
+       </ul>
+      </div>
+     {/if}
+
+     {#if (source.pdf?.length ?? 0) > 0}
+      <div class="doc-section">
+       <h3><a href="/source/{encodeURIComponent(source.source)}/pdf">PDF</a></h3>
+       <ul>
+        {#each (source.pdf ?? []).slice(0, 5) as doc}
+         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
+        {/each}
+        {#if (source.pdf?.length ?? 0) > 5}
+         <li class="more">+{(source.pdf?.length ?? 0) - 5} more</li>
         {/if}
        </ul>
       </div>

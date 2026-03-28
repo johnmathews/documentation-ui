@@ -29,6 +29,7 @@
    if (cat === "docs") docs = source.docs;
    else if (cat === "journal") docs = source.journal;
    else if (cat === "engineering_team") docs = source.engineering_team ?? [];
+   else if (cat === "pdf") docs = source.pdf ?? [];
    else {
     error = `Unknown category "${cat}"`;
     return;
@@ -64,7 +65,9 @@
    ? "Development Journal"
    : category === "engineering_team"
      ? "Engineering Team"
-     : "Documentation",
+     : category === "pdf"
+       ? "PDF"
+       : "Documentation",
  );
 </script>
 
