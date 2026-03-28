@@ -67,8 +67,15 @@
   }
  }
 
- let allExpanded = $derived(tree.length > 0 && tree.every((s) => expandedSources[s.source]));
- let allCollapsed = $derived(tree.length > 0 && tree.every((s) => !expandedSources[s.source]));
+ let allExpanded = $derived(tree.length > 0 && tree.every((s) =>
+  expandedSources[s.source] &&
+  expandedCategories[`${s.source}:docs`] &&
+  expandedCategories[`${s.source}:journal`] &&
+  expandedCategories[`${s.source}:engineering_team`]
+ ));
+ let allCollapsed = $derived(tree.length > 0 && tree.every((s) =>
+  !expandedSources[s.source]
+ ));
 
  function handleSearch() {
   clearTimeout(searchTimeout);

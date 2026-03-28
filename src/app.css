@@ -7,7 +7,7 @@
 /* Light mode (default) — exact GOV.UK colours */
 :root {
 	--header-height: 130px;
-	--sidebar-width: 320px;
+	--sidebar-width: 400px;
 	--chat-width: 360px;
 	--chat-width-expanded: 50vw;
 
@@ -260,7 +260,6 @@ button {
 
 .markdown-content pre code {
 	display: block;
-	max-width: 38em;
 	padding: 20px;
 	overflow-x: auto;
 	border: 0;
