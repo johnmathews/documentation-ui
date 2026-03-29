@@ -6,7 +6,7 @@
   - `api.ts` - Client-side API functions (types + fetch wrappers)
   - `stores.svelte.ts` - Shared reactive state (current doc ID, category filters)
   - `server/api.ts` - Server-side proxy utilities
-  - `components/` - Svelte components (Sidebar, ChatPanel)
+  - `components/` - Svelte components (Sidebar, SearchPanel, ChatPanel)
 - `src/routes/` - SvelteKit pages and API proxy routes
 - `docs/` - Project documentation
 - `journal/` - Development journal
@@ -30,4 +30,4 @@
 
 ## Backend Dependency
 
-This app requires the documentation MCP server running. In Docker, it connects via `http://docserver:8080`. For local dev, set `API_URL=http://localhost:8085` in `.env`.
+This app requires the documentation MCP server running. In Docker, it connects via `http://docserver:8080`. For local dev, the `.env` file sets `API_URL=http://localhost:8080` (the backend's default port). See `docs/development.md` for full local setup instructions.
