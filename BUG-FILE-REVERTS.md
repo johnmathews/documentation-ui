@@ -89,3 +89,10 @@ Working in a git worktree could help in two ways:
 2. **Prevention:** Even if we don't identify the root cause, working in a worktree provides natural protection — any rogue `git` command targeting the main worktree wouldn't affect the feature branch's worktree.
 
 **Recommendation:** Next time a multi-file feature is developed in this repo, use a worktree. If the reverts don't happen, that strongly suggests the cause is a process targeting the main working tree. If they still happen, the cause is something that follows the active Claude Code session regardless of directory.
+
+## Next steps
+
+1. **Use a worktree for the next multi-file feature** as a controlled experiment. This both protects against the bug and narrows the root cause.
+2. **Commit early and often** — after editing 2-3 files, commit immediately before running verification steps (Playwright, tests, dev server restarts). Committed changes cannot be silently reverted.
+3. **Monitor `git status` proactively** — check `git status` before and after dev server restarts, context compressions, or any long pause in the session.
+4. **If the bug recurs**, run `fs_usage -w -f filesys | grep documentation-ui` in a separate terminal to capture which process is writing to the files in real time.
