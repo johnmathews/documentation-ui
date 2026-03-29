@@ -1,7 +1,7 @@
 import { env } from "$env/dynamic/private";
 
 export function getApiBase(): string {
- return env.API_URL || "http://localhost:8085";
+ return env.API_URL || "http://localhost:8080";
 }
 
 export async function proxyGet(path: string): Promise<Response> {

@@ -1,5 +1,5 @@
 <script lang="ts">
- import { fetchTree, searchDocuments, type TreeSource, type SearchResult } from "$lib/api";
+ import { fetchTree, type TreeSource } from "$lib/api";
  import { currentDocId, categoryFilters, CATEGORIES } from "$lib/stores.svelte";
  import { sourceColorClass } from "$lib/colors";
  import { displaySource } from "$lib/titles";
@@ -13,11 +13,6 @@
  let error = $state("");
  let expandedSources: Record<string, boolean> = $state({});
  let expandedCategories: Record<string, boolean> = $state({});
-
- let searchQuery = $state("");
- let searchResults: SearchResult[] = $state([]);
- let searching = $state(false);
- let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
  $effect(() => {
   loadTree();
@@ -66,24 +61,6 @@
  let allExpanded = $derived(tree.length > 0 && tree.every((s) => expandedSources[s.source]));
  let allCollapsed = $derived(tree.length > 0 && tree.every((s) => !expandedSources[s.source]));
 
- function handleSearch() {
-  clearTimeout(searchTimeout);
-  if (!searchQuery.trim()) {
-   searchResults = [];
-   return;
-  }
-  searching = true;
-  searchTimeout = setTimeout(async () => {
-   try {
-    searchResults = await searchDocuments(searchQuery);
-   } catch {
-    searchResults = [];
-   } finally {
-    searching = false;
-   }
-  }, 300);
- }
-
  function docUrl(docId: string): string {
   return `/doc/${encodeURIComponent(docId)}`;
  }
@@ -108,10 +85,6 @@
 </script>
 
 <div class="sidebar-inner">
- <div class="search-box">
-  <input type="text" placeholder="Search documentation..." bind:value={searchQuery} oninput={handleSearch} />
- </div>
-
  <div class="filter-section">
   <button class="filter-toggle" onclick={() => (showFilters = !showFilters)}>
    <span class="filter-toggle-label">Filter categories</span>
@@ -150,28 +123,7 @@
   {/if}
  </div>
 
- {#if searchQuery.trim()}
-  <div class="search-results">
-   {#if searching}
-    <div class="loading-msg">Searching...</div>
-   {:else if searchResults.length === 0}
-    <div class="loading-msg">No results found</div>
-   {:else}
-    {#each searchResults as result}
-     <a
-      href={docUrl(result.doc_id)}
-      class="tree-item search-result-item"
-      class:active={isActive(result.doc_id)}
-      onclick={onNavigate}
-     >
-      <span class="item-title">{displayTitle(result)}</span>
-      <span class="source-tag {sourceColorClass(result.source)}">{displaySource(result.source)}</span>
-      <span class="item-snippet">{result.snippet}</span>
-     </a>
-    {/each}
-   {/if}
-  </div>
- {:else if loading}
+ {#if loading}
   <div class="loading-msg">Loading sources...</div>
  {:else if error}
   <div class="error-msg">{error}</div>
@@ -403,33 +355,6 @@
   flex-direction: column;
   height: 100%;
   background: var(--bg-surface);
- }
-
- .search-box {
-  padding: 15px;
-  border-bottom: 1px solid var(--border);
- }
-
- .search-box input {
-  width: 100%;
-  padding: 10px 15px;
-  background: var(--bg-body);
-  border: 2px solid var(--border-strong);
-  border-radius: 0;
-  color: var(--text);
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.15s;
- }
-
- .search-box input:focus {
-  outline: 3px solid var(--focus);
-  outline-offset: 0;
-  box-shadow: inset 0 0 0 2px var(--border-strong);
- }
-
- .search-box input::placeholder {
-  color: var(--text-muted);
  }
 
  /* Category filter section */
@@ -717,27 +642,6 @@
   white-space: nowrap;
  }
 
- .search-result-item {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-  padding-left: 20px;
- }
-
- .item-snippet {
-  font-size: 14px;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
- }
-
- .search-results {
-  flex: 1;
-  overflow-y: auto;
- }
-
  @media (max-width: 768px) {
   .filter-toggle {
    min-height: 44px;
@@ -775,10 +679,6 @@
   .tree-text-sep {
    font-size: 14px;
   }
-  .search-box input {
-   min-height: 44px;
-   font-size: 16px; /* Explicit 16px prevents iOS Safari auto-zoom on focus */
-  }
   .journal-link {
    min-height: 44px;
    display: inline-flex;
@@ -795,13 +695,6 @@
   }
   .tree-header-label {
    font-size: 16px;
-  }
-  .item-snippet {
-   font-size: 14px;
-  }
-  .search-result-item {
-   padding: 15px 20px;
-   min-height: 44px;
   }
   .loading-msg,
   .error-msg {

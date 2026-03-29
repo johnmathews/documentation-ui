@@ -397,6 +397,140 @@ describe("TreeSource optional field regression tests", () => {
  });
 });
 
+describe("searchDocuments with filters", () => {
+ const mockResults = [
+  {
+   doc_id: "repo:docs/a.md",
+   source: "repo",
+   file_path: "docs/a.md",
+   title: "Doc A",
+   created_at: "2025-01-15T00:00:00Z",
+   modified_at: "2025-03-01T00:00:00Z",
+   score: 0.5,
+   snippet: "About doc A",
+  },
+  {
+   doc_id: "repo:docs/b.md",
+   source: "repo",
+   file_path: "docs/b.md",
+   title: "Doc B",
+   created_at: "2025-06-10T00:00:00Z",
+   modified_at: "2025-07-20T00:00:00Z",
+   score: 0.6,
+   snippet: "About doc B",
+  },
+  {
+   doc_id: "other:docs/c.md",
+   source: "other",
+   file_path: "docs/c.md",
+   title: "Doc C",
+   created_at: null,
+   modified_at: null,
+   score: 0.7,
+   snippet: "About doc C",
+  },
+ ];
+
+ beforeEach(() => {
+  vi.restoreAllMocks();
+  vi.stubGlobal(
+   "fetch",
+   vi.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve(mockResults),
+   }),
+  );
+ });
+
+ it("passes source filter as query parameter", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  await searchDocuments("test", { source: "repo" });
+  expect(fetch).toHaveBeenCalledWith("/api/search?q=test&source=repo", undefined);
+ });
+
+ it("returns all results when no filters are applied", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test");
+  expect(results).toHaveLength(3);
+ });
+
+ it("filters by createdAfter", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { createdAfter: "2025-03-01" });
+  expect(results).toHaveLength(2);
+  expect(results.map((r) => r.doc_id)).toContain("repo:docs/b.md");
+  expect(results.map((r) => r.doc_id)).toContain("other:docs/c.md");
+ });
+
+ it("filters by createdBefore", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { createdBefore: "2025-03-01" });
+  expect(results).toHaveLength(2);
+  expect(results.map((r) => r.doc_id)).toContain("repo:docs/a.md");
+  expect(results.map((r) => r.doc_id)).toContain("other:docs/c.md");
+ });
+
+ it("filters by modifiedAfter", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { modifiedAfter: "2025-05-01" });
+  expect(results).toHaveLength(2);
+ });
+
+ it("filters by modifiedBefore", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { modifiedBefore: "2025-05-01" });
+  expect(results).toHaveLength(2);
+ });
+
+ it("combines multiple date filters", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", {
+   createdAfter: "2025-02-01",
+   createdBefore: "2025-12-01",
+  });
+  expect(results).toHaveLength(2);
+  expect(results.map((r) => r.doc_id)).toContain("repo:docs/b.md");
+ });
+
+ it("passes documents with null dates through date filters", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", {
+   createdAfter: "2025-01-01",
+   modifiedBefore: "2025-12-31",
+  });
+  expect(results.map((r) => r.doc_id)).toContain("other:docs/c.md");
+ });
+});
+
+describe("fetchSources", () => {
+ beforeEach(() => {
+  vi.restoreAllMocks();
+ });
+
+ it("returns source names from health endpoint", async () => {
+  vi.stubGlobal(
+   "fetch",
+   vi.fn().mockResolvedValue({
+    ok: true,
+    json: () =>
+     Promise.resolve({
+      status: "ok",
+      total_sources: 2,
+      total_chunks: 100,
+      sources: [
+       { source: "alpha-repo", file_count: 10, chunk_count: 50, last_indexed: null },
+       { source: "beta-docs", file_count: 5, chunk_count: 50, last_indexed: null },
+      ],
+     }),
+   }),
+  );
+
+  const { fetchSources } = await import("$lib/api");
+  const sources = await fetchSources();
+  expect(sources).toEqual(["alpha-repo", "beta-docs"]);
+ });
+});
+
 describe("future-proofing: new optional categories", () => {
  it("TreeSource handles additional unknown fields from backend", () => {
   // If the backend adds a new category in the future, the UI should not crash

@@ -3,6 +3,7 @@
  import favicon from "$lib/assets/favicon.svg";
  import Sidebar from "$lib/components/Sidebar.svelte";
  import ChatPanel from "$lib/components/ChatPanel.svelte";
+ import SearchPanel from "$lib/components/SearchPanel.svelte";
  import { currentDocId } from "$lib/stores.svelte";
  import { page } from "$app/state";
  import { MediaQuery } from "svelte/reactivity";
@@ -13,6 +14,7 @@
  let sidebarOpen = $state(false);
  let chatOpen = $state(false);
  let chatExpanded = $state(false);
+ let searchOpen = $state(false);
  // eslint-disable-next-line svelte/prefer-writable-derived
  let darkMode = $state(false);
 
@@ -197,6 +199,21 @@
     </button>
     <button
      class="govuk-header__action-btn"
+     class:active={searchOpen}
+     onclick={() => {
+      searchOpen = !searchOpen;
+      if (searchOpen) sidebarOpen = false;
+     }}
+     title="Search documentation"
+    >
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+     </svg>
+     <span class="govuk-header__btn-label">Search</span>
+    </button>
+    <button
+     class="govuk-header__action-btn"
      class:active={chatOpen}
      onclick={() => {
       chatOpen = !chatOpen;
@@ -246,13 +263,14 @@
   </div>
  </nav>
 
- {#if sidebarOpen || chatOpen}
+ {#if sidebarOpen || chatOpen || searchOpen}
   <button
    class="backdrop"
    onclick={() => {
     sidebarOpen = false;
     chatOpen = false;
     chatExpanded = false;
+    searchOpen = false;
    }}
    aria-label="Close panel"
   ></button>
@@ -286,6 +304,19 @@
 </aside>
 
 <aside
+ class="search-panel"
+ class:open={searchOpen}
+ style="width: {isMobile.current ? '100%' : sidebarWidth + 'px'}"
+ aria-hidden={!searchOpen}
+>
+ <SearchPanel
+  onNavigate={() => {
+   if (window.innerWidth <= 768) searchOpen = false;
+  }}
+ />
+</aside>
+
+<aside
  class="chat-panel"
  class:expanded={chatExpanded}
  class:hidden={!chatOpen}
@@ -305,6 +336,8 @@
    if (chatOpen) {
     chatOpen = false;
     chatExpanded = false;
+   } else if (searchOpen) {
+    searchOpen = false;
    } else if (sidebarOpen && isMobile.current) {
     sidebarOpen = false;
    }
@@ -549,6 +582,25 @@
   user-select: none;
  }
 
+ .search-panel {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  z-index: 200;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+ }
+
+ .search-panel.open {
+  display: flex;
+ }
+
  .sidebar-resize-handle {
   position: absolute;
   top: 0;
@@ -635,6 +687,11 @@
  /* Below 769px: full-width overlays + mobile sizing */
  @media (max-width: 768px) {
   .sidebar {
+   width: 100%;
+   max-width: none;
+  }
+
+  .search-panel {
    width: 100%;
    max-width: none;
   }

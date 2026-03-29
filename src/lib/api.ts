@@ -82,10 +82,35 @@ export async function fetchDocument(docId: string): Promise<FullDocument> {
  return apiFetch<FullDocument>(`/api/documents/${encodeURIComponent(docId)}`);
 }
 
-export async function searchDocuments(query: string, source?: string): Promise<SearchResult[]> {
+export interface SearchFilters {
+ source?: string;
+ createdAfter?: string;
+ createdBefore?: string;
+ modifiedAfter?: string;
+ modifiedBefore?: string;
+}
+
+export async function searchDocuments(query: string, filters?: SearchFilters): Promise<SearchResult[]> {
  const params = new URLSearchParams({ q: query });
- if (source) params.set("source", source);
- return apiFetch<SearchResult[]>(`/api/search?${params}`);
+ if (filters?.source) params.set("source", filters.source);
+ const results = await apiFetch<SearchResult[]>(`/api/search?${params}`);
+ return filterResultsByDate(results, filters);
+}
+
+function filterResultsByDate(results: SearchResult[], filters?: SearchFilters): SearchResult[] {
+ if (!filters) return results;
+ return results.filter((r) => {
+  if (filters.createdAfter && r.created_at && r.created_at < filters.createdAfter) return false;
+  if (filters.createdBefore && r.created_at && r.created_at > filters.createdBefore) return false;
+  if (filters.modifiedAfter && r.modified_at && r.modified_at < filters.modifiedAfter) return false;
+  if (filters.modifiedBefore && r.modified_at && r.modified_at > filters.modifiedBefore) return false;
+  return true;
+ });
+}
+
+export async function fetchSources(): Promise<string[]> {
+ const health = await fetchHealth();
+ return health.sources.map((s) => s.source);
 }
 
 export async function sendChat(message: string, docId?: string, history?: ChatMessage[]): Promise<string> {

@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CATEGORIES, type CategoryKey } from "$lib/stores.svelte";
 
 describe("CATEGORIES constant", () => {
- it("contains exactly 4 categories", () => {
-  expect(CATEGORIES).toHaveLength(4);
+ it("contains exactly 5 categories", () => {
+  expect(CATEGORIES).toHaveLength(5);
  });
 
  it("has root_docs as the first category", () => {
@@ -35,7 +35,7 @@ describe("CATEGORIES constant", () => {
 
  it("CategoryKey type matches the defined keys", () => {
   // This is a compile-time check, but we can verify at runtime too
-  const validKeys: CategoryKey[] = ["root_docs", "docs", "journal", "engineering_team"];
+  const validKeys: CategoryKey[] = ["root_docs", "docs", "journal", "engineering_team", "pdf"];
   const actualKeys = CATEGORIES.map((c) => c.key);
   expect(actualKeys).toEqual(validKeys);
  });
