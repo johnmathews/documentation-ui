@@ -127,7 +127,7 @@ New: Refactor to CSS class approach.
 - Background: `--bg-surface`
 - Border-bottom: `1px solid var(--border)`
 - Height: stays 56px
-- App title "Documentation": 24px bold, `--text` color
+- App title "Library": 24px bold, `--text` color
 - Nav links: `--text-secondary` color, underline on hover, active page bold + `--text`
 - Theme toggle + chat toggle: keep functionality, restyle icons
 - Remove any background colors on nav items

@@ -84,6 +84,7 @@ export async function fetchDocument(docId: string): Promise<FullDocument> {
 
 export interface SearchFilters {
  source?: string;
+ docType?: string;
  createdAfter?: string;
  createdBefore?: string;
  modifiedAfter?: string;
@@ -94,12 +95,24 @@ export async function searchDocuments(query: string, filters?: SearchFilters): P
  const params = new URLSearchParams({ q: query });
  if (filters?.source) params.set("source", filters.source);
  const results = await apiFetch<SearchResult[]>(`/api/search?${params}`);
- return filterResultsByDate(results, filters);
+ return filterResults(results, filters);
 }
 
-function filterResultsByDate(results: SearchResult[], filters?: SearchFilters): SearchResult[] {
+export function categorizeFilePath(filePath: string): string {
+ if (filePath.toLowerCase().endsWith(".pdf")) return "pdf";
+ if (filePath.includes("journal/") || filePath.includes("journal\\")) return "journal";
+ if (filePath.includes(".engineering-team/") || filePath.includes(".engineering-team\\")) return "engineering_team";
+ if (filePath.includes("/") || filePath.includes("\\")) return "docs";
+ return "root_docs";
+}
+
+function filterResults(results: SearchResult[], filters?: SearchFilters): SearchResult[] {
  if (!filters) return results;
  return results.filter((r) => {
+  if (filters.docType) {
+   const category = categorizeFilePath(r.file_path || "");
+   if (category !== filters.docType) return false;
+  }
   if (filters.createdAfter && r.created_at && r.created_at < filters.createdAfter) return false;
   if (filters.createdBefore && r.created_at && r.created_at > filters.createdBefore) return false;
   if (filters.modifiedAfter && r.modified_at && r.modified_at < filters.modifiedAfter) return false;

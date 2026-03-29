@@ -19,6 +19,9 @@
  let selectedSource = $state("");
  let sourcesLoading = $state(true);
 
+ // Doc type filter
+ let selectedDocType = $state("");
+
  // Date filters
  let createdAfterDay = $state("");
  let createdAfterMonth = $state("");
@@ -58,6 +61,7 @@
  function buildFilters(): SearchFilters {
   return {
    source: selectedSource || undefined,
+   docType: selectedDocType || undefined,
    createdAfter: buildDateString(createdAfterDay, createdAfterMonth, createdAfterYear),
    createdBefore: buildDateString(createdBeforeDay, createdBeforeMonth, createdBeforeYear),
    modifiedAfter: buildDateString(modifiedAfterDay, modifiedAfterMonth, modifiedAfterYear),
@@ -66,8 +70,7 @@
  }
 
  let activeFilterCount = $derived(
-  (selectedSource ? 1 : 0) +
-   (createdAfterYear ? 1 : 0) +
+  (createdAfterYear ? 1 : 0) +
    (createdBeforeYear ? 1 : 0) +
    (modifiedAfterYear ? 1 : 0) +
    (modifiedBeforeYear ? 1 : 0),
@@ -112,6 +115,7 @@
 
  function clearFilters() {
   selectedSource = "";
+  selectedDocType = "";
   createdAfterDay = "";
   createdAfterMonth = "";
   createdAfterYear = "";
@@ -169,6 +173,52 @@
   </div>
  </form>
 
+ <!-- Source & type filters — always visible -->
+ <div class="primary-filters">
+  <fieldset class="filter-group">
+   <legend class="filter-group-legend">Source</legend>
+   {#if sourcesLoading}
+    <p class="filter-hint">Loading sources...</p>
+   {:else if availableSources.length === 0}
+    <p class="filter-hint">No sources available</p>
+   {:else}
+    <div class="filter-select-wrapper">
+     <select
+      class="filter-select"
+      bind:value={selectedSource}
+      onchange={() => {
+       if (searchQuery.trim()) handleSearch();
+      }}
+     >
+      <option value="">All sources</option>
+      {#each availableSources as source}
+       <option value={source}>{displaySource(source)}</option>
+      {/each}
+     </select>
+    </div>
+   {/if}
+  </fieldset>
+  <fieldset class="filter-group">
+   <legend class="filter-group-legend">Type</legend>
+   <div class="filter-select-wrapper">
+    <select
+     class="filter-select"
+     bind:value={selectedDocType}
+     onchange={() => {
+      if (searchQuery.trim()) handleSearch();
+     }}
+    >
+     <option value="">All types</option>
+     <option value="root_docs">Root Docs</option>
+     <option value="docs">Docs</option>
+     <option value="journal">Journal</option>
+     <option value="engineering_team">Engineering Team</option>
+     <option value="pdf">PDF</option>
+    </select>
+   </div>
+  </fieldset>
+ </div>
+
  <div class="filter-section">
   <button class="filter-toggle" onclick={() => (showFilters = !showFilters)}>
    <span class="filter-toggle-label">Filters</span>
@@ -191,31 +241,6 @@
 
   {#if showFilters}
    <div class="filter-body">
-    <!-- Source filter -->
-    <fieldset class="filter-group">
-     <legend class="filter-group-legend">Source</legend>
-     {#if sourcesLoading}
-      <p class="filter-hint">Loading sources...</p>
-     {:else if availableSources.length === 0}
-      <p class="filter-hint">No sources available</p>
-     {:else}
-      <div class="filter-select-wrapper">
-       <select
-        class="filter-select"
-        bind:value={selectedSource}
-        onchange={() => {
-         if (searchQuery.trim()) handleSearch();
-        }}
-       >
-        <option value="">All sources</option>
-        {#each availableSources as source}
-         <option value={source}>{displaySource(source)}</option>
-        {/each}
-       </select>
-      </div>
-     {/if}
-    </fieldset>
-
     <!-- Created date filter -->
     <fieldset class="filter-group">
      <legend class="filter-group-legend">Created date</legend>
@@ -532,6 +557,12 @@
   background: var(--focus);
   border-color: var(--focus);
   color: var(--focus-text);
+ }
+
+ /* Primary filters — always visible */
+ .primary-filters {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--border);
  }
 
  /* Filter section */

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { categorizeFilePath } from "$lib/api";
 import type { TreeSource, TreeDocument } from "$lib/api";
 import { sourceColorClass } from "$lib/colors";
 import { displayTitle } from "$lib/titles";
@@ -528,6 +529,167 @@ describe("fetchSources", () => {
   const { fetchSources } = await import("$lib/api");
   const sources = await fetchSources();
   expect(sources).toEqual(["alpha-repo", "beta-docs"]);
+ });
+});
+
+describe("categorizeFilePath", () => {
+ it("detects PDF files by extension", () => {
+  expect(categorizeFilePath("docs/report.pdf")).toBe("pdf");
+  expect(categorizeFilePath("report.PDF")).toBe("pdf");
+  expect(categorizeFilePath("deep/nested/file.Pdf")).toBe("pdf");
+ });
+
+ it("detects journal files", () => {
+  expect(categorizeFilePath("journal/260101-init.md")).toBe("journal");
+  expect(categorizeFilePath("source/journal/entry.md")).toBe("journal");
+ });
+
+ it("detects engineering_team files", () => {
+  expect(categorizeFilePath(".engineering-team/eval.md")).toBe("engineering_team");
+  expect(categorizeFilePath("source/.engineering-team/plan.md")).toBe("engineering_team");
+ });
+
+ it("detects docs (files in subdirectories)", () => {
+  expect(categorizeFilePath("docs/setup.md")).toBe("docs");
+  expect(categorizeFilePath("nested/deep/file.md")).toBe("docs");
+ });
+
+ it("detects root_docs (no directory separator)", () => {
+  expect(categorizeFilePath("README.md")).toBe("root_docs");
+  expect(categorizeFilePath("CLAUDE.md")).toBe("root_docs");
+ });
+
+ it("returns root_docs for empty string", () => {
+  expect(categorizeFilePath("")).toBe("root_docs");
+ });
+
+ it("prioritizes PDF over other categories", () => {
+  // A PDF in a journal directory should still be categorized as PDF
+  expect(categorizeFilePath("journal/report.pdf")).toBe("pdf");
+ });
+});
+
+describe("searchDocuments with docType filter", () => {
+ const mockResults = [
+  {
+   doc_id: "repo:README.md",
+   source: "repo",
+   file_path: "README.md",
+   title: "README",
+   created_at: "2025-01-01T00:00:00Z",
+   modified_at: "2025-01-01T00:00:00Z",
+   score: 0.9,
+   snippet: "Root doc",
+  },
+  {
+   doc_id: "repo:docs/setup.md",
+   source: "repo",
+   file_path: "docs/setup.md",
+   title: "Setup",
+   created_at: "2025-02-01T00:00:00Z",
+   modified_at: "2025-02-01T00:00:00Z",
+   score: 0.8,
+   snippet: "Setup doc",
+  },
+  {
+   doc_id: "repo:journal/260101-init.md",
+   source: "repo",
+   file_path: "journal/260101-init.md",
+   title: "Init",
+   created_at: "2026-01-01T00:00:00Z",
+   modified_at: "2026-01-01T00:00:00Z",
+   score: 0.7,
+   snippet: "Journal entry",
+  },
+  {
+   doc_id: "repo:.engineering-team/eval.md",
+   source: "repo",
+   file_path: ".engineering-team/eval.md",
+   title: "Eval",
+   created_at: "2025-06-01T00:00:00Z",
+   modified_at: "2025-06-01T00:00:00Z",
+   score: 0.6,
+   snippet: "Engineering eval",
+  },
+  {
+   doc_id: "repo:docs/report.pdf",
+   source: "repo",
+   file_path: "docs/report.pdf",
+   title: "Report",
+   created_at: "2025-03-01T00:00:00Z",
+   modified_at: "2025-03-01T00:00:00Z",
+   score: 0.5,
+   snippet: "PDF report",
+  },
+ ];
+
+ beforeEach(() => {
+  vi.restoreAllMocks();
+  vi.stubGlobal(
+   "fetch",
+   vi.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve(mockResults),
+   }),
+  );
+ });
+
+ it("returns all results when docType is not set", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test");
+  expect(results).toHaveLength(5);
+ });
+
+ it("filters by root_docs type", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { docType: "root_docs" });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:README.md");
+ });
+
+ it("filters by docs type", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { docType: "docs" });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:docs/setup.md");
+ });
+
+ it("filters by journal type", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { docType: "journal" });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:journal/260101-init.md");
+ });
+
+ it("filters by engineering_team type", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { docType: "engineering_team" });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:.engineering-team/eval.md");
+ });
+
+ it("filters by pdf type", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", { docType: "pdf" });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:docs/report.pdf");
+ });
+
+ it("combines docType with date filters", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  const results = await searchDocuments("test", {
+   docType: "docs",
+   createdAfter: "2025-01-15",
+  });
+  expect(results).toHaveLength(1);
+  expect(results[0].doc_id).toBe("repo:docs/setup.md");
+ });
+
+ it("returns empty when docType matches no results", async () => {
+  const { searchDocuments } = await import("$lib/api");
+  // All mock results have file_path set, but filter for a type that doesn't exist in results
+  const results = await searchDocuments("test", { docType: "root_docs", createdAfter: "2026-01-01" });
+  expect(results).toHaveLength(0);
  });
 });
 
