@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
- <title>Root Docs - Documentation</title>
+ <title>Root Docs - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

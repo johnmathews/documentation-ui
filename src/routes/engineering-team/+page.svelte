@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
- <title>Engineering Team - Documentation</title>
+ <title>Engineering Team - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

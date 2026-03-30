@@ -4,7 +4,7 @@ const DESKTOP = { width: 1280, height: 800 };
 
 // --- Selectors ---
 const searchBtn = (page: Page) => page.getByTitle('Search documentation');
-const filePickerBtn = (page: Page) => page.getByRole('button', { name: 'File Picker' });
+const filePickerBtn = (page: Page) => page.getByTitle('File picker');
 const searchPanel = (page: Page) => page.locator('aside.search-panel');
 const sidebarPanel = (page: Page) => page.locator('aside.sidebar');
 const searchInput = (page: Page) => page.getByRole('searchbox', { name: 'Search documentation' });
@@ -135,15 +135,15 @@ test.describe('Search state preservation across panel switches', () => {
 // =================================================================================
 
 test.describe('Navbar visual separator', () => {
-	test('search button has left border separator from icon buttons', async ({ page }) => {
+	test('files button has left border separator from icon buttons', async ({ page }) => {
 		await page.setViewportSize(DESKTOP);
 		await page.goto('/');
 		await page.waitForLoadState('networkidle');
 
-		const borderLeft = await searchBtn(page).evaluate(
+		const borderLeft = await filePickerBtn(page).evaluate(
 			(el) => getComputedStyle(el).borderLeftWidth
 		);
-		const marginLeft = await searchBtn(page).evaluate(
+		const marginLeft = await filePickerBtn(page).evaluate(
 			(el) => getComputedStyle(el).marginLeft
 		);
 

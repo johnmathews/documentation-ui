@@ -50,7 +50,7 @@
 </script>
 
 <svelte:head>
- <title>{displaySource(sourceName)} - Documentation</title>
+ <title>{displaySource(sourceName)} - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

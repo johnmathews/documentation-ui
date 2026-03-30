@@ -187,7 +187,7 @@
   <div class="govuk-header__container">
    <div class="govuk-header__logo">
     <a href="/" class="govuk-header__link govuk-header__link--homepage">
-     <span class="govuk-header__product-name">Documentation</span>
+     <span class="govuk-header__product-name"><span class="govuk-header__product-name-prefix">Documentation</span> Library</span>
     </a>
    </div>
    <div class="govuk-header__actions">
@@ -230,7 +230,21 @@
      </svg>
     </button>
     <button
-     class="govuk-header__action-btn govuk-header__action-btn--search"
+     class="govuk-header__action-btn govuk-header__action-btn--panels"
+     class:active={sidebarOpen}
+     onclick={() => {
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) searchOpen = false;
+     }}
+     title="File picker"
+    >
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+     </svg>
+     <span class="govuk-header__btn-label">Files</span>
+    </button>
+    <button
+     class="govuk-header__action-btn"
      class:active={searchOpen}
      onclick={() => {
       searchOpen = !searchOpen;
@@ -266,17 +280,6 @@
  <nav class="govuk-service-nav" aria-label="Service navigation">
   <div class="govuk-service-nav__container">
    <ul class="govuk-service-nav__list">
-    <li class="govuk-service-nav__item">
-     <button
-      class="govuk-service-nav__link govuk-service-nav__link--btn"
-      onclick={() => {
-       sidebarOpen = !sidebarOpen;
-       if (sidebarOpen) searchOpen = false;
-      }}
-     >
-      File Picker
-     </button>
-    </li>
     <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/"}>
      <a href="/" class="govuk-service-nav__link">
       {#if currentPath === "/"}<strong>All Documents</strong>{:else}All Documents{/if}
@@ -430,7 +433,7 @@
  }
 
  .govuk-header__link--homepage {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
   color: #fff;
   text-decoration: none;
@@ -454,10 +457,14 @@
   display: inline-block;
  }
 
+ .govuk-header__product-name-prefix {
+  display: inline;
+ }
+
  .govuk-header__actions {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
  }
 
  .govuk-header__action-btn {
@@ -486,7 +493,7 @@
   outline: none;
  }
 
- .govuk-header__action-btn--search {
+ .govuk-header__action-btn--panels {
   margin-left: 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.3);
   padding-left: 15px;
@@ -532,7 +539,7 @@
  }
 
  .govuk-service-nav__item {
-  margin-right: 20px;
+  margin-right: 30px;
  }
 
  .govuk-service-nav__link {
@@ -560,33 +567,6 @@
   background: var(--focus);
   box-shadow: none;
   text-decoration: none;
- }
-
- .govuk-service-nav__link--btn {
-  background: none;
-  border: none;
-  border-bottom: 5px solid transparent;
-  padding: 15px 0 12px;
-  color: #fff;
-  font-size: 19px;
-  line-height: 1.3157894737;
-  cursor: pointer;
-  font-family: inherit;
- }
-
- .govuk-service-nav__link--btn:hover {
-  color: #fff;
-  text-decoration: underline;
- }
-
- .govuk-service-nav__link--btn:focus {
-  color: var(--focus-text);
-  background: var(--focus);
-  box-shadow: none;
-  text-decoration: none;
-  outline: none;
-  border-bottom-color: transparent;
-  padding: 15px 5px 12px;
  }
 
  .govuk-service-nav__item--active .govuk-service-nav__link {
@@ -778,6 +758,10 @@
    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
   }
 
+  .govuk-header__actions {
+   gap: 2px;
+  }
+
   .govuk-header__btn-label {
    display: none;
   }
@@ -785,14 +769,23 @@
   .govuk-header__action-btn {
    min-height: 44px;
    min-width: 44px;
-   padding: 10px;
+   padding: 10px 8px;
+  }
+
+  .govuk-header__action-btn--panels {
+   margin-left: 4px;
+   padding-left: 10px;
   }
 
   .govuk-header__link--homepage {
-   font-size: 24px;
+   font-size: 20px;
    min-height: 44px;
    display: inline-flex;
    align-items: center;
+  }
+
+  .govuk-header__product-name-prefix {
+   display: none;
   }
 
   .govuk-service-nav__link {

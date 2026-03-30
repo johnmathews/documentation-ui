@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
- <title>{doc?.title || "Document"} - Documentation</title>
+ <title>{doc?.title || "Document"} - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

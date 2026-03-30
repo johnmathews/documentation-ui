@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
- <title>Documentation</title>
+ <title>Documentation Library</title>
 </svelte:head>
 
 <!-- GOV.UK-style masthead hero -->

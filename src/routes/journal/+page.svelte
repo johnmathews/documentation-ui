@@ -82,7 +82,7 @@
 </script>
 
 <svelte:head>
- <title>Journal Timeline - Documentation</title>
+ <title>Journal Timeline - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

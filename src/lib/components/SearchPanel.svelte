@@ -221,7 +221,7 @@
 
  <div class="filter-section">
   <button class="filter-toggle" onclick={() => (showFilters = !showFilters)}>
-   <span class="filter-toggle-label">Filters</span>
+   <span class="filter-toggle-label">Date Filters</span>
    {#if activeFilterCount > 0}
     <span class="filter-badge">{activeFilterCount} active</span>
    {/if}

@@ -72,7 +72,7 @@
 </script>
 
 <svelte:head>
- <title>{categoryLabel} - {displaySource(sourceName)} - Documentation</title>
+ <title>{categoryLabel} - {displaySource(sourceName)} - Documentation Library</title>
 </svelte:head>
 
 {#if loading}

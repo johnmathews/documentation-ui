@@ -9,7 +9,7 @@ const DESKTOP = { width: 1280, height: 800 };
 // --- Helpers --------------------------------------------------------------------
 
 const sidebar = (page: Page) => page.locator('aside.sidebar');
-const filePickerBtn = (page: Page) => page.getByRole('button', { name: 'File Picker' });
+const filePickerBtn = (page: Page) => page.getByTitle('File picker');
 const backdrop = (page: Page) => page.locator('button.backdrop');
 const content = (page: Page) => page.locator('main.content');
 
@@ -24,7 +24,7 @@ async function isSidebarVisible(page: Page): Promise<boolean> {
 }
 
 // NOTE: sidebarOpen defaults to false — the sidebar starts CLOSED on all viewports.
-// Users open it via the "File Picker" button in the service nav.
+// Users open it via the "Files" button in the header.
 
 // =================================================================================
 // Mobile portrait sidebar

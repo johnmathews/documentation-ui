@@ -8,7 +8,7 @@ const IPHONE_LANDSCAPE = { width: 844, height: 390 };
 
 const sidebar = (page: Page) => page.locator('aside.sidebar');
 const chatPanel = (page: Page) => page.locator('aside.chat-panel');
-const filePickerBtn = (page: Page) => page.getByRole('button', { name: 'File Picker' });
+const filePickerBtn = (page: Page) => page.getByTitle('File picker');
 const chatBtn = (page: Page) => page.getByTitle('Toggle chat');
 const chatTextarea = (page: Page) => page.locator('.chat-input textarea');
 const sendBtn = (page: Page) => page.locator('.send-btn');

@@ -101,7 +101,7 @@
 </script>
 
 <svelte:head>
- <title>Server Status - Documentation</title>
+ <title>Server Status - Documentation Library</title>
 </svelte:head>
 
 {#if loading}
