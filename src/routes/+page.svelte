@@ -38,8 +38,7 @@
  <div class="masthead__inner">
   <h1 class="masthead__title">Browse all documentation sources</h1>
   <p class="masthead__description">
-   Search across {tree.length} projects, including journal entries and engineering analyses. Use
-   the chat to ask questions about your docs.
+   Search across {tree.length} projects — docs, journals, and analyses — or ask a question in the chat.
   </p>
  </div>
 </div>
