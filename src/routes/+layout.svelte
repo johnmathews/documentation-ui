@@ -546,8 +546,8 @@
   display: inline-block;
   padding: 15px 0 12px;
   color: #fff;
-  font-size: 19px;
-  line-height: 1.3157894737;
+  font-size: 17px;
+  line-height: 1.35;
   text-decoration: none;
   border-bottom: 5px solid transparent;
   font-family: inherit;
