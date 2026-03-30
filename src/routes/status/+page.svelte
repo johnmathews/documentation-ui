@@ -335,6 +335,7 @@
  .source-table {
   border-collapse: collapse;
   font-size: 16px;
+  width: auto;
  }
 
  .source-table th {
