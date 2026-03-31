@@ -121,8 +121,8 @@
      <li>
       <a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a>
       <span class="dates">
-       {#if doc.modified_at}<span class="date">edited {formatDate(doc.modified_at)}</span>{/if}
-       {#if doc.created_at}<span class="date created">created {formatDate(doc.created_at)}</span>{/if}
+       {#if doc.modified_at}<span class="date">{formatDate(doc.modified_at)}</span>{/if}
+       {#if doc.created_at && doc.created_at !== doc.modified_at}<span class="date created">{formatDate(doc.created_at)}</span>{/if}
       </span>
      </li>
     {/each}
@@ -203,8 +203,8 @@
  .doc-list li {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
+  align-items: baseline;
+  padding: 6px 0;
   border-bottom: 1px solid var(--border);
  }
  .doc-list a {
@@ -217,11 +217,10 @@
 
  .dates {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: baseline;
   flex-shrink: 0;
   margin-left: 15px;
-  gap: 1px;
+  gap: 10px;
  }
 
  .date {

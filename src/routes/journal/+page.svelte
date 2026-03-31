@@ -7,9 +7,15 @@
   source: string;
  }
 
- let entries: JournalEntry[] = $state([]);
+ let allEntries: JournalEntry[] = $state([]);
+ let sources: string[] = $state([]);
+ let activeSource: string | null = $state(null);
  let loading = $state(true);
  let error = $state("");
+
+ let entries = $derived(
+  activeSource ? allEntries.filter((e) => e.source === activeSource) : allEntries,
+ );
 
  $effect(() => {
   currentDocId.value = null;
@@ -20,7 +26,9 @@
   try {
    const tree = await fetchTree();
    const all: JournalEntry[] = [];
+   const srcSet = new Set<string>();
    for (const source of tree) {
+    if (source.journal.length > 0) srcSet.add(source.source);
     for (const doc of source.journal) {
      all.push({ ...doc, source: source.source });
     }
@@ -30,7 +38,8 @@
     const db = b.created_at || b.modified_at || "";
     return db.localeCompare(da);
    });
-   entries = all;
+   allEntries = all;
+   sources = [...srcSet].sort((a, b) => displaySource(a).localeCompare(displaySource(b)));
   } catch (e) {
    error = e instanceof Error ? e.message : "Failed to load";
   } finally {
@@ -96,7 +105,7 @@
  <div class="masthead">
   <div class="masthead__inner">
    <h1 class="masthead__title">Journal Timeline</h1>
-   <p class="masthead__description">All development journal entries.</p>
+   <p class="masthead__description">{entries.length} journal entries{activeSource ? ` from ${displaySource(activeSource)}` : " across all projects"}.</p>
   </div>
  </div>
 
@@ -107,8 +116,17 @@
    <span class="current">Journal Timeline</span>
   </nav>
 
+  {#if sources.length > 1}
+   <div class="source-filters">
+    <button class="filter-btn" class:active={activeSource === null} onclick={() => activeSource = null}>All</button>
+    {#each sources as src}
+     <button class="filter-btn {sourceColorClass(src)}" class:active={activeSource === src} onclick={() => activeSource = activeSource === src ? null : src}>{displaySource(src)}</button>
+    {/each}
+   </div>
+  {/if}
+
   {#if entries.length === 0}
-   <p class="empty">No journal entries found.</p>
+   <p class="empty">No journal entries found{activeSource ? ` for ${displaySource(activeSource)}` : ""}.</p>
   {:else}
    <div class="timeline">
     {#each groupedEntries as group}
@@ -242,6 +260,34 @@
  .current {
   color: var(--text);
   font-weight: normal;
+ }
+
+ .source-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 25px;
+ }
+
+ .filter-btn {
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--stat-tag-bg, rgba(128, 128, 128, 0.15));
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+ }
+
+ .filter-btn:hover {
+  border-color: var(--border);
+ }
+
+ .filter-btn.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
  }
 
  .empty {
