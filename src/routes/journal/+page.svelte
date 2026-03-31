@@ -139,7 +139,7 @@
         <a href={docUrl(entry.doc_id)} class="entry-card">
          <div class="entry-header">
           <span class="entry-date" class:invisible={day === prevDay}>{day}</span>
-          <span class="entry-source {sourceColorClass(entry.source)}">{displaySource(entry.source)}</span>
+          {#if !activeSource}<span class="entry-source {sourceColorClass(entry.source)}">{displaySource(entry.source)}</span>{/if}
           <span class="entry-title">{displayTitle(entry)}</span>
          </div>
         </a>
