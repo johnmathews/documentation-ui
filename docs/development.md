@@ -81,7 +81,7 @@ src/
       Breadcrumbs.svelte  # Breadcrumb navigation
   routes/
     +layout.svelte        # Main layout (header, sidebar, search, chat panels)
-    +page.svelte          # Home page (source overview)
+    +page.svelte          # Home page (project list with metadata)
     doc/[id]/
       +page.svelte        # Document viewer
     api/                  # Server-side proxy routes

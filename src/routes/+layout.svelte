@@ -282,7 +282,7 @@
    <ul class="govuk-service-nav__list">
     <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/"}>
      <a href="/" class="govuk-service-nav__link">
-      {#if currentPath === "/"}<strong>All Documents</strong>{:else}All Documents{/if}
+      {#if currentPath === "/"}<strong>Projects</strong>{:else}Projects{/if}
      </a>
     </li>
     <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/root-docs"}>

@@ -4,7 +4,7 @@
  import { currentDocId } from "$lib/stores.svelte";
  import { sourceColorClass } from "$lib/colors";
  import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
- import { displaySource } from "$lib/titles";
+ import { displaySource, displayTitle, stripSourcePrefix } from "$lib/titles";
  import { renderMarkdownWithLinks } from "$lib/links";
 
  let doc: FullDocument | null = $state(null);
@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
- <title>{doc?.title || "Document"} - Documentation Library</title>
+ <title>{doc ? displayTitle(doc) : "Document"} - Documentation Library</title>
 </svelte:head>
 
 {#if loading}
@@ -87,7 +87,7 @@
       : doc.file_path.includes(".engineering-team/")
         ? "engineering_team"
         : "docs"}
-   title={doc.title || doc.file_path.split("/").pop() || doc.file_path}
+   title={doc.title ? stripSourcePrefix(doc.title, doc.source) : doc.file_path.split("/").pop() || doc.file_path}
   />
   <header class="doc-header">
    <div class="doc-meta-row">

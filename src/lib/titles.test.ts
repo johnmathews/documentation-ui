@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { displaySource, displayTitle } from "$lib/titles";
+import { displaySource, displayTitle, stripSourcePrefix } from "$lib/titles";
 
 describe("displaySource", () => {
  it("converts hyphens to spaces and title-cases", () => {
@@ -31,6 +31,101 @@ describe("displaySource", () => {
  it("returns original name for empty string", () => {
   // displaySource returns name if result would be empty after trim
   expect(displaySource("")).toBe("");
+ });
+});
+
+describe("stripSourcePrefix", () => {
+ it("strips PascalCase project name from title with em-dash separator", () => {
+  expect(stripSourcePrefix("DocumentStream — Implementation Plan", "document-stream")).toBe("Implementation Plan");
+ });
+
+ it("strips PascalCase project name from title with space only", () => {
+  expect(stripSourcePrefix("DocumentStream Dictionary", "document-stream")).toBe("Dictionary");
+ });
+
+ it("strips when source has underscores", () => {
+  expect(stripSourcePrefix("HomeServer Setup Guide", "home_server")).toBe("Setup Guide");
+ });
+
+ it("strips with en-dash separator", () => {
+  expect(stripSourcePrefix("DocumentStream – Redis Pipeline", "document-stream")).toBe("Redis Pipeline");
+ });
+
+ it("strips with colon separator", () => {
+  expect(stripSourcePrefix("DocumentStream: Getting Started", "document-stream")).toBe("Getting Started");
+ });
+
+ it("strips with comma separator", () => {
+  expect(stripSourcePrefix("DocumentStream, Overview", "document-stream")).toBe("Overview");
+ });
+
+ it("strips with hyphen separator", () => {
+  expect(stripSourcePrefix("DocumentStream - Architecture", "document-stream")).toBe("Architecture");
+ });
+
+ it("returns original title when source does not match", () => {
+  expect(stripSourcePrefix("Unrelated Title", "document-stream")).toBe("Unrelated Title");
+ });
+
+ it("returns original title if stripping would leave nothing", () => {
+  expect(stripSourcePrefix("DocumentStream", "document-stream")).toBe("DocumentStream");
+ });
+
+ it("handles empty source", () => {
+  expect(stripSourcePrefix("Some Title", "")).toBe("Some Title");
+ });
+});
+
+describe("displayTitle with source prefix stripping", () => {
+ it("strips source prefix from title when source is provided", () => {
+  expect(
+   displayTitle({
+    title: "DocumentStream — Implementation Plan",
+    file_path: "docs/implementation-plan.md",
+    source: "document-stream",
+   }),
+  ).toBe("Implementation Plan");
+ });
+
+ it("does not strip when source is not provided", () => {
+  expect(
+   displayTitle({
+    title: "DocumentStream — Implementation Plan",
+    file_path: "docs/implementation-plan.md",
+   }),
+  ).toBe("DocumentStream — Implementation Plan");
+ });
+});
+
+describe("displayTitle SKILL.md handling", () => {
+ it("uses parent directory name for skills/*/SKILL.md", () => {
+  expect(
+   displayTitle({ title: "About", file_path: "skills/code-review/SKILL.md" }),
+  ).toBe("Skill: Code Review");
+ });
+
+ it("uses parent directory name even when title is null", () => {
+  expect(
+   displayTitle({ title: null, file_path: "skills/code-review/SKILL.md" }),
+  ).toBe("Skill: Code Review");
+ });
+
+ it("handles underscores in skill directory name", () => {
+  expect(
+   displayTitle({ title: "About", file_path: "skills/my_custom_skill/SKILL.md" }),
+  ).toBe("Skill: My Custom Skill");
+ });
+
+ it("preserves short acronyms in skill name", () => {
+  expect(
+   displayTitle({ title: null, file_path: "skills/api-client/SKILL.md" }),
+  ).toBe("Skill: API Client");
+ });
+
+ it("is case-insensitive on the filename", () => {
+  expect(
+   displayTitle({ title: null, file_path: "skills/foo/skill.md" }),
+  ).toBe("Skill: Foo");
  });
 });
 

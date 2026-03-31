@@ -322,8 +322,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-  margin-left: auto;
-  text-align: right;
  }
 
  @media (max-width: 640px) {

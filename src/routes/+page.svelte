@@ -1,7 +1,8 @@
 <script lang="ts">
- import { fetchTree, type TreeSource } from "$lib/api";
+ import { fetchTree, type TreeSource, type TreeDocument } from "$lib/api";
  import { currentDocId } from "$lib/stores.svelte";
  import { sourceColorClass } from "$lib/colors";
+ import { displaySource } from "$lib/titles";
 
  let tree: TreeSource[] = $state([]);
  let loading = $state(true);
@@ -22,11 +23,34 @@
   }
  }
 
- function docUrl(docId: string): string {
-  return `/doc/${encodeURIComponent(docId)}`;
+ function allDocs(source: TreeSource): TreeDocument[] {
+  return [
+   ...source.root_docs,
+   ...source.docs,
+   ...source.journal,
+   ...(source.engineering_team ?? []),
+   ...(source.pdf ?? []),
+  ];
  }
 
- import { displayTitle, displaySource } from "$lib/titles";
+ function docCount(source: TreeSource): number {
+  return allDocs(source).length;
+ }
+
+ function lastUpdated(source: TreeSource): string | null {
+  let latest: string | null = null;
+  for (const doc of allDocs(source)) {
+   const date = doc.modified_at ?? doc.created_at;
+   if (date && (!latest || date > latest)) latest = date;
+  }
+  return latest;
+ }
+
+ function formatDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+ }
 </script>
 
 <svelte:head>
@@ -36,9 +60,9 @@
 <!-- GOV.UK-style masthead hero -->
 <div class="masthead">
  <div class="masthead__inner">
-  <h1 class="masthead__title">Browse all documentation sources</h1>
+  <h1 class="masthead__title">Documentation Library</h1>
   <p class="masthead__description">
-   Search across {tree.length} projects — docs, journals, and analyses — or ask a question in the chat.
+   {tree.length} projects indexed — browse a project or use search and chat.
   </p>
  </div>
 </div>
@@ -54,90 +78,28 @@
    <p>Check that the MCP server is running and has sources configured.</p>
   </div>
  {:else}
-  <div class="sources-grid">
-   {#each tree as source}
-    <div class="source-card {sourceColorClass(source.source)}">
-     <h2><a href="/source/{encodeURIComponent(source.source)}">{displaySource(source.source)}</a></h2>
-     <div class="stats">
-      <span class="stat-tag">{source.root_docs.length + source.docs.length} docs</span>
-      <span class="stat-tag">{source.journal.length} journal</span>
-      {#if (source.engineering_team?.length ?? 0) > 0}
-       <span class="stat-tag">{source.engineering_team?.length ?? 0} analyses</span>
-      {/if}
-      {#if (source.pdf?.length ?? 0) > 0}
-       <span class="stat-tag">{source.pdf?.length ?? 0} PDFs</span>
-      {/if}
-     </div>
-
-     {#if source.root_docs.length > 0}
-      <div class="doc-section">
-       <h3>Root Docs</h3>
-       <ul>
-        {#each source.root_docs as doc}
-         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
-        {/each}
-       </ul>
-      </div>
-     {/if}
-
-     {#if source.docs.length > 0}
-      <div class="doc-section">
-       <h3><a href="/source/{encodeURIComponent(source.source)}/docs">Documentation</a></h3>
-       <ul>
-        {#each source.docs.slice(0, 5) as doc}
-         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
-        {/each}
-        {#if source.docs.length > 5}
-         <li class="more">+{source.docs.length - 5} more</li>
-        {/if}
-       </ul>
-      </div>
-     {/if}
-
-     {#if source.journal.length > 0}
-      <div class="doc-section">
-       <h3><a href="/source/{encodeURIComponent(source.source)}/journal">Recent Journal Entries</a></h3>
-       <ul>
-        {#each source.journal.slice(0, 3) as doc}
-         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
-        {/each}
-        {#if source.journal.length > 3}
-         <li class="more">+{source.journal.length - 3} more</li>
-        {/if}
-       </ul>
-      </div>
-     {/if}
-
-     {#if (source.engineering_team?.length ?? 0) > 0}
-      <div class="doc-section">
-       <h3><a href="/source/{encodeURIComponent(source.source)}/engineering_team">Engineering Team</a></h3>
-       <ul>
-        {#each (source.engineering_team ?? []).slice(0, 3) as doc}
-         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
-        {/each}
-        {#if (source.engineering_team?.length ?? 0) > 3}
-         <li class="more">+{(source.engineering_team?.length ?? 0) - 3} more</li>
-        {/if}
-       </ul>
-      </div>
-     {/if}
-
-     {#if (source.pdf?.length ?? 0) > 0}
-      <div class="doc-section">
-       <h3><a href="/source/{encodeURIComponent(source.source)}/pdf">PDF</a></h3>
-       <ul>
-        {#each (source.pdf ?? []).slice(0, 5) as doc}
-         <li><a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a></li>
-        {/each}
-        {#if (source.pdf?.length ?? 0) > 5}
-         <li class="more">+{(source.pdf?.length ?? 0) - 5} more</li>
-        {/if}
-       </ul>
-      </div>
-     {/if}
-    </div>
-   {/each}
-  </div>
+  <table class="source-table">
+   <thead>
+    <tr>
+     <th>Project</th>
+     <th class="col-date">Last updated</th>
+     <th class="col-count">Documents</th>
+    </tr>
+   </thead>
+   <tbody>
+    {#each tree as source}
+     <tr>
+      <td>
+       <a class="source-link {sourceColorClass(source.source)}" href="/source/{encodeURIComponent(source.source)}"
+        >{displaySource(source.source)}</a
+       >
+      </td>
+      <td class="col-date">{formatDate(lastUpdated(source))}</td>
+      <td class="col-count">{docCount(source)}</td>
+     </tr>
+    {/each}
+   </tbody>
+  </table>
  {/if}
 </div>
 
@@ -213,98 +175,66 @@
   color: var(--error);
  }
 
- .sources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
-  gap: 20px;
+ /* GOV.UK-style table */
+ .source-table {
+  border-collapse: collapse;
+  font-size: 1rem;
+  line-height: 1.25;
  }
 
- .source-card {
-  background: var(--bg-body);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  padding: 25px;
+ .source-table thead {
+  border-bottom: 2px solid var(--text);
  }
 
- .source-card h2 {
-  font-size: 24px;
+ .source-table th {
+  text-align: left;
   font-weight: 700;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  padding: 10px 20px 10px 0;
+  color: var(--text);
  }
 
- .source-card h2 a {
+ .source-table tbody tr {
+  border-bottom: 1px solid var(--border);
+ }
+
+ .source-table td {
+  padding: 15px 20px 15px 0;
+  vertical-align: top;
+ }
+
+ .source-link {
+  font-size: 1.1875rem;
+  font-weight: 700;
   color: var(--link);
   text-decoration: underline;
   text-decoration-thickness: max(1px, 0.0625rem);
   text-underline-offset: 0.1578em;
  }
 
- .source-card h2 a:hover {
+ .source-link:hover {
   color: var(--link-hover);
   text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
  }
 
- .stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 15px;
+ .source-link:focus {
+  outline: 3px solid transparent;
+  color: var(--focus-text);
+  background-color: var(--focus);
+  box-shadow:
+   0 -2px var(--focus),
+   0 4px var(--focus-text);
+  text-decoration: none;
  }
 
- .stat-tag {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  padding: 2px 8px;
-  text-transform: uppercase;
-  background: var(--stat-tag-bg, rgba(128, 128, 128, 0.15));
+ .col-count,
+ .col-date {
   color: var(--text-secondary);
+  white-space: nowrap;
  }
 
- .doc-section {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border);
- }
-
- .doc-section h3 {
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 10px;
- }
-
- .doc-section h3 a {
-  color: var(--link);
-  font-weight: 700;
- }
-
- .doc-section h3 a:hover {
-  color: var(--link-hover);
- }
-
- .doc-section ul {
-  list-style: disc;
-  padding-left: 20px;
-  margin: 0;
- }
-
- .doc-section li {
-  padding: 3px 0;
-  font-size: 16px;
-  line-height: 1.25;
- }
-
- .doc-section a {
-  font-size: 16px;
- }
-
- .more {
-  font-size: 16px;
-  color: var(--text-secondary);
-  list-style: none;
-  margin-left: -20px;
+ .col-count {
+  text-align: right;
  }
 
  @media (max-width: 640px) {
@@ -314,26 +244,17 @@
    padding-right: 15px;
   }
 
-  .sources-grid {
-   grid-template-columns: 1fr;
+  .source-table th,
+  .source-table td {
+   padding-right: 10px;
   }
-  .stat-tag {
-   font-size: 13px;
+
+  .source-link {
+   font-size: 1rem;
   }
-  .doc-section h3 {
-   font-size: 16px;
-  }
-  .doc-section li {
-   padding: 5px 0;
-  }
-  .doc-section a {
-   min-height: 36px;
-   display: inline-flex;
-   align-items: center;
-   font-size: 16px;
-  }
-  .more {
-   font-size: 14px;
+
+  .col-date {
+   display: none;
   }
  }
 </style>

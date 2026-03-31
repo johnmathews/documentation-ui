@@ -13,7 +13,7 @@ documentation.
 - **Layout**: Three-panel layout with sidebar, content area, and collapsible chat panel. The header bar has the product
   name "Documentation Library" (shortened to "Library" on mobile) on the left and two icon groups on the right: utility
   actions (theme toggle, server status, print) and panel toggles (Files, Search, Chat), separated by a vertical border.
-  The service navigation bar below the header contains only page-level navigation links: All Documents, Root Docs, Dev
+  The service navigation bar below the header contains only page-level navigation links: Projects, Root Docs, Dev
   Journal, and Engineering Team. The sidebar (file picker) and search panel have mutual exclusion — opening one closes
   the other.
 - **Sidebar**: Tree navigation organized by Source > Category (Root Docs/Documentation Directory/Development

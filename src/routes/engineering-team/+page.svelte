@@ -96,7 +96,6 @@
        {#each group.docs as doc}
         <a href={docUrl(doc.doc_id)} class="doc-card">
          <span class="doc-title">{displayTitle(doc)}</span>
-         <span class="doc-path">{doc.file_path}</span>
         </a>
        {/each}
       </div>
