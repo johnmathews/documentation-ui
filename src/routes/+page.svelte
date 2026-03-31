@@ -8,6 +8,36 @@
  let loading = $state(true);
  let error = $state("");
 
+ type SortCol = "project" | "date" | "count";
+ let sortCol: SortCol = $state("date");
+ let sortAsc = $state(false);
+
+ function toggleSort(col: SortCol) {
+  if (sortCol === col) {
+   sortAsc = !sortAsc;
+  } else {
+   sortCol = col;
+   sortAsc = col === "project"; // default asc for project, desc for others
+  }
+ }
+
+ let sortedTree = $derived.by(() => {
+  const copy = [...tree];
+  const dir = sortAsc ? 1 : -1;
+  copy.sort((a, b) => {
+   if (sortCol === "project") {
+    return dir * displaySource(a.source).localeCompare(displaySource(b.source));
+   } else if (sortCol === "date") {
+    const da = lastUpdated(a) ?? "";
+    const db = lastUpdated(b) ?? "";
+    return dir * da.localeCompare(db);
+   } else {
+    return dir * (docCount(a) - docCount(b));
+   }
+  });
+  return copy;
+ });
+
  $effect(() => {
   currentDocId.value = null;
   loadTree();
@@ -81,13 +111,19 @@
   <table class="source-table">
    <thead>
     <tr>
-     <th>Project</th>
-     <th class="col-date">Last updated</th>
-     <th class="col-count">Documents</th>
+     <th class="sortable" onclick={() => toggleSort("project")}>
+      Project <span class="sort-arrow">{sortCol === "project" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
+     </th>
+     <th class="col-date sortable" onclick={() => toggleSort("date")}>
+      Last updated <span class="sort-arrow">{sortCol === "date" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
+     </th>
+     <th class="col-count sortable" onclick={() => toggleSort("count")}>
+      Documents <span class="sort-arrow">{sortCol === "count" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
+     </th>
     </tr>
    </thead>
    <tbody>
-    {#each tree as source}
+    {#each sortedTree as source}
      <tr>
       <td>
        <a class="source-link {sourceColorClass(source.source)}" href="/source/{encodeURIComponent(source.source)}"
@@ -192,6 +228,21 @@
   font-size: 1rem;
   padding: 10px 20px 10px 0;
   color: var(--text);
+ }
+
+ .sortable {
+  cursor: pointer;
+  user-select: none;
+ }
+
+ .sortable:hover {
+  text-decoration: underline;
+ }
+
+ .sort-arrow {
+  font-size: 0.7rem;
+  margin-left: 2px;
+  opacity: 0.7;
  }
 
  .source-table tbody tr {
