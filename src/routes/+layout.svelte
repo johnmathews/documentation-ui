@@ -229,8 +229,9 @@
       <rect x="6" y="14" width="12" height="8" />
      </svg>
     </button>
+    <span class="govuk-header__separator" aria-hidden="true"></span>
     <button
-     class="govuk-header__action-btn govuk-header__action-btn--panels"
+     class="govuk-header__action-btn"
      class:active={sidebarOpen}
      onclick={() => {
       sidebarOpen = !sidebarOpen;
@@ -493,10 +494,12 @@
   outline: none;
  }
 
- .govuk-header__action-btn--panels {
-  margin-left: 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  padding-left: 15px;
+ .govuk-header__separator {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  margin: 0 6px;
  }
 
  .govuk-header__btn-label {
@@ -772,9 +775,8 @@
    padding: 10px 8px;
   }
 
-  .govuk-header__action-btn--panels {
-   margin-left: 4px;
-   padding-left: 10px;
+  .govuk-header__separator {
+   margin: 0 2px;
   }
 
   .govuk-header__link--homepage {
