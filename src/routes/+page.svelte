@@ -58,6 +58,7 @@
    ...source.root_docs,
    ...source.docs,
    ...source.journal,
+   ...(source.learning_journal ?? []),
    ...(source.engineering_team ?? []),
    ...(source.pdf ?? []),
   ];

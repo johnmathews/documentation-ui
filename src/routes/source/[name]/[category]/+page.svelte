@@ -32,6 +32,7 @@
    }
    if (cat === "docs") docs = source.docs;
    else if (cat === "journal") docs = source.journal;
+   else if (cat === "learning_journal") docs = source.learning_journal ?? [];
    else if (cat === "engineering_team") docs = source.engineering_team ?? [];
    else if (cat === "pdf") docs = source.pdf ?? [];
    else {
@@ -79,11 +80,13 @@
  let categoryLabel = $derived(
   category === "journal"
    ? "Development Journal"
-   : category === "engineering_team"
-     ? "Engineering Team"
-     : category === "pdf"
-       ? "PDF"
-       : "Documentation",
+   : category === "learning_journal"
+     ? "Learning Journal"
+     : category === "engineering_team"
+       ? "Engineering Team"
+       : category === "pdf"
+         ? "PDF"
+         : "Documentation",
  );
 </script>
 

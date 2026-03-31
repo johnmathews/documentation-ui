@@ -296,6 +296,11 @@
       {#if currentPath === "/journal"}<strong>Dev Journal</strong>{:else}Dev Journal{/if}
      </a>
     </li>
+    <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/learning-journal"}>
+     <a href="/learning-journal" class="govuk-service-nav__link">
+      {#if currentPath === "/learning-journal"}<strong>Learning Journal</strong>{:else}Learning Journal{/if}
+     </a>
+    </li>
     <li class="govuk-service-nav__item" class:govuk-service-nav__item--active={currentPath === "/engineering-team"}>
      <a href="/engineering-team" class="govuk-service-nav__link">
       {#if currentPath === "/engineering-team"}<strong>Engineering Team</strong>{:else}Engineering Team{/if}

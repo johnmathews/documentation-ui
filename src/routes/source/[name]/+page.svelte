@@ -84,6 +84,9 @@
    <div class="stats">
     <span class="stat-tag">{source.root_docs.length + source.docs.length} docs</span>
     <span class="stat-tag">{source.journal.length} journal</span>
+    {#if (source.learning_journal?.length ?? 0) > 0}
+     <span class="stat-tag">{source.learning_journal?.length ?? 0} learning</span>
+    {/if}
     {#if (source.engineering_team?.length ?? 0) > 0}
      <span class="stat-tag">{source.engineering_team?.length ?? 0} analyses</span>
     {/if}
@@ -136,6 +139,23 @@
     <h2><a href="/source/{encodeURIComponent(source.source)}/journal">Development Journal</a></h2>
     <ul class="doc-list">
      {#each sortDocs(source.journal) as doc}
+      <li>
+       <a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a>
+       <span class="dates">
+        {#if doc.modified_at}<span class="date">{formatDate(doc.modified_at)}</span>{/if}
+        {#if doc.created_at && doc.created_at !== doc.modified_at}<span class="date created">{formatDate(doc.created_at)}</span>{/if}
+       </span>
+      </li>
+     {/each}
+    </ul>
+   </section>
+  {/if}
+
+  {#if (source.learning_journal?.length ?? 0) > 0}
+   <section>
+    <h2><a href="/source/{encodeURIComponent(source.source)}/learning_journal">Learning Journal</a></h2>
+    <ul class="doc-list">
+     {#each sortDocs(source.learning_journal ?? []) as doc}
       <li>
        <a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a>
        <span class="dates">

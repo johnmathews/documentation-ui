@@ -6,6 +6,7 @@ export interface TreeSource {
  root_docs: TreeDocument[];
  docs: TreeDocument[];
  journal: TreeDocument[];
+ learning_journal?: TreeDocument[];
  engineering_team?: TreeDocument[];
  pdf?: TreeDocument[];
 }
@@ -100,6 +101,7 @@ export async function searchDocuments(query: string, filters?: SearchFilters): P
 
 export function categorizeFilePath(filePath: string): string {
  if (filePath.toLowerCase().endsWith(".pdf")) return "pdf";
+ if (filePath.includes("learning/") || filePath.includes("learning\\")) return "learning_journal";
  if (filePath.includes("journal/") || filePath.includes("journal\\")) return "journal";
  if (filePath.includes(".engineering-team/") || filePath.includes(".engineering-team\\")) return "engineering_team";
  if (filePath.includes("/") || filePath.includes("\\")) return "docs";

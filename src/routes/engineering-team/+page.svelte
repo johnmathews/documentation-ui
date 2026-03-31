@@ -14,6 +14,9 @@
  let loading = $state(true);
  let error = $state("");
 
+ type SortMode = "edited" | "created" | "alpha";
+ let sortMode: SortMode = $state("edited");
+
  $effect(() => {
   currentDocId.value = null;
   loadDocs();
@@ -46,6 +49,35 @@
 
  function docUrl(docId: string): string {
   return `/doc/${encodeURIComponent(docId)}`;
+ }
+
+ function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "";
+  try {
+   return new Date(dateStr).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+   return dateStr;
+  }
+ }
+
+ function sortDocs(list: EngDoc[]): EngDoc[] {
+  const copy = [...list];
+  if (sortMode === "alpha") {
+   copy.sort((a, b) => displayTitle(a).localeCompare(displayTitle(b)));
+  } else if (sortMode === "created") {
+   copy.sort((a, b) => {
+    const da = a.created_at ?? "";
+    const db = b.created_at ?? "";
+    return db.localeCompare(da);
+   });
+  } else {
+   copy.sort((a, b) => {
+    const da = a.modified_at ?? a.created_at ?? "";
+    const db = b.modified_at ?? b.created_at ?? "";
+    return db.localeCompare(da);
+   });
+  }
+  return copy;
  }
 
  let filteredDocs = $derived(
@@ -92,14 +124,21 @@
    <span class="current">Engineering Team</span>
   </nav>
 
-  {#if sources.length > 1}
-   <div class="source-filters">
-    <button class="filter-btn" class:active={activeSource === null} onclick={() => activeSource = null}>All</button>
-    {#each sources as src}
-     <button class="filter-btn {sourceColorClass(src)}" class:active={activeSource === src} onclick={() => activeSource = activeSource === src ? null : src}>{displaySource(src)}</button>
-    {/each}
+  <div class="controls-row">
+   {#if sources.length > 1}
+    <div class="source-filters">
+     <button class="filter-btn" class:active={activeSource === null} onclick={() => activeSource = null}>All</button>
+     {#each sources as src}
+      <button class="filter-btn {sourceColorClass(src)}" class:active={activeSource === src} onclick={() => activeSource = activeSource === src ? null : src}>{displaySource(src)}</button>
+     {/each}
+    </div>
+   {/if}
+   <div class="sort-toggle">
+    <button class:active={sortMode === "edited"} onclick={() => sortMode = "edited"}>Edited</button>
+    <button class:active={sortMode === "created"} onclick={() => sortMode = "created"}>Created</button>
+    <button class:active={sortMode === "alpha"} onclick={() => sortMode = "alpha"}>A–Z</button>
    </div>
-  {/if}
+  </div>
 
   {#if filteredDocs.length === 0}
    <p class="empty">No engineering team documents found{activeSource ? ` for ${displaySource(activeSource)}` : ""}.</p>
@@ -110,13 +149,17 @@
       <h2 class="source-header">
        <span class="source-tag {sourceColorClass(group.source)}">{displaySource(group.source)}</span>
       </h2>
-      <div class="doc-list">
-       {#each group.docs as doc}
-        <a href={docUrl(doc.doc_id)} class="doc-card">
-         <span class="doc-title">{displayTitle(doc)}</span>
-        </a>
+      <ul class="doc-list">
+       {#each sortDocs(group.docs) as doc}
+        <li>
+         <a href={docUrl(doc.doc_id)}>{displayTitle(doc)}</a>
+         <span class="dates">
+          {#if doc.modified_at}<span class="date">{formatDate(doc.modified_at)}</span>{/if}
+          {#if doc.created_at && doc.created_at !== doc.modified_at}<span class="date created">{formatDate(doc.created_at)}</span>{/if}
+         </span>
+        </li>
        {/each}
-      </div>
+      </ul>
      </div>
     {/each}
    </div>
@@ -278,55 +321,103 @@
   padding: 2px 8px;
  }
 
- .doc-list {
+ .controls-row {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  gap: 12px;
  }
 
- .doc-card {
+ .sort-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+ }
+
+ .sort-toggle button {
+  padding: 4px 12px;
+  font-size: 14px;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+ }
+
+ .sort-toggle button:last-child {
+  border-right: none;
+ }
+
+ .sort-toggle button.active {
+  background: var(--brand);
+  color: #fff;
+ }
+
+ .sort-toggle button:hover:not(.active) {
+  background: var(--stat-tag-bg, rgba(128, 128, 128, 0.15));
+ }
+
+ .doc-list {
+  list-style: none;
+ }
+
+ .doc-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+ }
+
+ .doc-list a {
+  color: var(--link);
+  font-size: 16px;
+ }
+
+ .doc-list a:hover {
+  color: var(--link-hover);
+ }
+
+ .dates {
   display: flex;
   align-items: baseline;
-  gap: 15px;
-  padding: 12px 15px;
-  text-decoration: none;
-  color: var(--text);
-  border-left: 4px solid transparent;
-  transition: all 0.1s;
+  flex-shrink: 0;
+  margin-left: 15px;
+  gap: 10px;
  }
 
- .doc-card:hover {
-  background: var(--bg-hover);
-  border-left-color: var(--brand);
- }
-
- .doc-card:visited {
-  color: var(--text);
- }
-
- .doc-title {
-  font-size: 19px;
-  font-weight: 700;
- }
-
- .doc-path {
+ .date {
   font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+ }
+
+ .date.created {
   color: var(--text-muted);
-  font-family: var(--font-mono);
+  font-size: 13px;
  }
 
  @media (max-width: 640px) {
-  .doc-card {
+  .controls-row {
    flex-direction: column;
-   gap: 4px;
-   padding: 15px;
-   min-height: 44px;
   }
-  .doc-title {
+  .doc-list li {
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 5px;
+   padding: 10px 0;
+  }
+  .doc-list a {
+   min-height: 44px;
+   display: inline-flex;
+   align-items: center;
    font-size: 16px;
   }
-  .doc-path {
-   font-size: 14px;
+  .dates {
+   margin-left: 0;
   }
  }
 </style>
