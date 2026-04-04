@@ -1,23 +1,32 @@
 <script lang="ts">
- import { fetchTree, type TreeSource, type TreeDocument } from "$lib/api";
+ import { fetchTree, fetchHealth, type TreeSource, type TreeDocument, type HealthStatus, type HealthSource } from "$lib/api";
  import { currentDocId } from "$lib/stores.svelte";
  import { sourceColorClass } from "$lib/colors";
  import { displaySource } from "$lib/titles";
 
  let tree: TreeSource[] = $state([]);
+ let health: HealthStatus | null = $state(null);
  let loading = $state(true);
  let error = $state("");
 
- type SortCol = "project" | "date" | "count";
+ type SortCol = "project" | "status" | "date" | "count";
  let sortCol: SortCol = $state("date");
  let sortAsc = $state(false);
+
+ const statusOrder: Record<string, number> = { error: 0, warning: 1, unknown: 2, healthy: 3 };
+
+ let healthBySource = $derived.by(() => {
+  const map: Record<string, HealthSource> = {};
+  if (health) for (const s of health.sources) map[s.source] = s;
+  return map;
+ });
 
  function toggleSort(col: SortCol) {
   if (sortCol === col) {
    sortAsc = !sortAsc;
   } else {
    sortCol = col;
-   sortAsc = col === "project"; // default asc for project, desc for others
+   sortAsc = col === "project" || col === "status"; // default asc for project/status, desc for others
   }
  }
 
@@ -27,6 +36,10 @@
   copy.sort((a, b) => {
    if (sortCol === "project") {
     return dir * displaySource(a.source).localeCompare(displaySource(b.source));
+   } else if (sortCol === "status") {
+    const sa = healthBySource[a.source]?.source_status ?? "unknown";
+    const sb = healthBySource[b.source]?.source_status ?? "unknown";
+    return dir * ((statusOrder[sa] ?? 2) - (statusOrder[sb] ?? 2));
    } else if (sortCol === "date") {
     const da = lastUpdated(a) ?? "";
     const db = lastUpdated(b) ?? "";
@@ -40,12 +53,17 @@
 
  $effect(() => {
   currentDocId.value = null;
-  loadTree();
+  loadData();
  });
 
- async function loadTree() {
+ async function loadData() {
   try {
-   tree = await fetchTree();
+   const [treeResult, healthResult] = await Promise.all([
+    fetchTree(),
+    fetchHealth().catch(() => null),
+   ]);
+   tree = treeResult;
+   health = healthResult;
   } catch (e) {
    error = e instanceof Error ? e.message : "Failed to load";
   } finally {
@@ -82,6 +100,39 @@
   const d = new Date(iso);
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
  }
+
+ function timeAgo(iso: string | null): string {
+  if (!iso) return "";
+  try {
+   const diff = Date.now() - new Date(iso).getTime();
+   const mins = Math.floor(diff / 60000);
+   if (mins < 1) return "just now";
+   if (mins < 60) return `${mins}m ago`;
+   const hours = Math.floor(mins / 60);
+   if (hours < 24) return `${hours}h ago`;
+   const days = Math.floor(hours / 24);
+   return `${days}d ago`;
+  } catch {
+   return "";
+  }
+ }
+
+ function statusLabel(s: string): string {
+  if (s === "healthy") return "Healthy";
+  if (s === "warning") return "Warning";
+  if (s === "error") return "Error";
+  return "Unknown";
+ }
+
+ function statusTooltip(src: HealthSource): string {
+  const s = src.source_status;
+  if (s === "healthy") return "Healthy: Last scan succeeded with no errors.";
+  if (s === "warning")
+   return `Warning: 1 consecutive scan failure or scan is overdue.${src.last_error ? `\n\nLast error: ${src.last_error}` : ""}`;
+  if (s === "error")
+   return `Error: 2+ consecutive scan failures or scan is severely overdue.${src.last_error ? `\n\nLast error: ${src.last_error}` : ""}`;
+  return "Unknown: This source has not been scanned yet.";
+ }
 </script>
 
 <svelte:head>
@@ -109,11 +160,29 @@
    <p>Check that the MCP server is running and has sources configured.</p>
   </div>
  {:else}
+  {#if health}
+   <a
+    class="status-badge"
+    class:ok={health.status === "healthy"}
+    class:warn={health.status === "degraded"}
+    class:err={health.status === "error"}
+    href="/status"
+    title={health.status === "healthy"
+     ? "Healthy: All sources are scanning successfully."
+     : health.status === "degraded"
+      ? "Degraded: One or more sources have scan failures or are stale."
+      : "Error: All sources are failing or unreachable."}>
+    {health.status === "healthy" ? "Healthy" : health.status === "degraded" ? "Degraded" : "Error"}
+   </a>
+  {/if}
   <table class="source-table">
    <thead>
     <tr>
      <th class="sortable" onclick={() => toggleSort("project")}>
       Project <span class="sort-arrow">{sortCol === "project" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
+     </th>
+     <th class="col-status sortable" onclick={() => toggleSort("status")}>
+      Status <span class="sort-arrow">{sortCol === "status" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
      </th>
      <th class="col-date sortable" onclick={() => toggleSort("date")}>
       Last updated <span class="sort-arrow">{sortCol === "date" ? (sortAsc ? "\u25B2" : "\u25BC") : ""}</span>
@@ -125,13 +194,34 @@
    </thead>
    <tbody>
     {#each sortedTree as source}
+     {@const h = healthBySource[source.source]}
+     {@const updated = lastUpdated(source)}
      <tr>
       <td>
        <a class="source-link {sourceColorClass(source.source)}" href="/source/{encodeURIComponent(source.source)}"
         >{displaySource(source.source)}</a
        >
       </td>
-      <td class="col-date">{formatDate(lastUpdated(source))}</td>
+      <td class="col-status">
+       {#if h}
+        <span
+         class="src-status"
+         class:src-healthy={h.source_status === "healthy"}
+         class:src-warning={h.source_status === "warning"}
+         class:src-error={h.source_status === "error"}
+         class:src-unknown={h.source_status === "unknown"}
+         title={statusTooltip(h)}>
+         {statusLabel(h.source_status)}
+         {#if h.consecutive_failures > 0}
+          <span class="failure-count">({h.consecutive_failures})</span>
+         {/if}
+        </span>
+       {/if}
+      </td>
+      <td class="col-date">
+       <span class="date">{formatDate(updated)}</span>
+       <span class="time-ago">{timeAgo(updated)}</span>
+      </td>
       <td class="col-count">{docCount(source)}</td>
      </tr>
     {/each}
@@ -280,13 +370,75 @@
  }
 
  .col-count,
- .col-date {
+ .col-date,
+ .col-status {
   color: var(--text-secondary);
   white-space: nowrap;
  }
 
  .col-count {
   text-align: right;
+ }
+
+ .status-badge {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 12px;
+  margin-bottom: 20px;
+  text-decoration: none;
+ }
+
+ .status-badge.ok {
+  background: var(--success);
+  color: #ffffff;
+ }
+
+ .status-badge.warn {
+  background: var(--warning);
+  color: #ffffff;
+ }
+
+ .status-badge.err {
+  background: var(--error);
+  color: #ffffff;
+ }
+
+ .status-badge:hover {
+  opacity: 0.9;
+ }
+
+ .src-status {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+ }
+
+ .src-healthy {
+  color: var(--success);
+ }
+
+ .src-warning {
+  color: var(--warning);
+ }
+
+ .src-error {
+  color: var(--error);
+ }
+
+ .src-unknown {
+  color: var(--text-muted);
+ }
+
+ .failure-count {
+  font-weight: 400;
+  font-size: 12px;
+ }
+
+ .time-ago {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-left: 8px;
  }
 
  @media (max-width: 640px) {
@@ -306,6 +458,10 @@
   }
 
   .col-date {
+   display: none;
+  }
+
+  .time-ago {
    display: none;
   }
  }

@@ -50,8 +50,11 @@ documentation.
   preserved when the panel is toggled closed and reopened. On desktop, the panel is resizable via a drag handle on its
   right edge (250–800px range, persisted to localStorage as `search-width`). Default width is 320px (384px on large
   screens).
-- **Homepage**: Project list table at `/` with sortable columns (Project, Last updated, Documents). Default sort is by
-  last updated descending. Click column headers to sort; click again to toggle direction.
+- **Homepage**: Project list table at `/` with sortable columns (Project, Status, Last updated, Documents). Default
+  sort is by last updated descending. Click column headers to sort; click again to toggle direction. The overall
+  system status badge (Healthy/Degraded/Error, links to `/status`) is shown between the masthead and the table, and
+  each row shows its per-source status badge plus a relative time-ago label beside the last-updated date. Health data
+  is fetched in parallel with the tree and degrades gracefully if `/api/health` fails.
 - **Source Pages**: Per-source view at `/source/<name>` showing documents grouped by category with a Recent/A-Z sort
   toggle. Each document shows both edited and created dates (inline, no labels). Categories shown: Root Docs,
   Documentation, Development Journal, Learning Journal, Engineering Team, PDF.
